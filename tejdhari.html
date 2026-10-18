@@ -62,7 +62,7 @@ footer{background:var(--panel);border-top:1px solid var(--line);padding:6px 16px
 @media (prefers-color-scheme: light){:root{--s1:#1baf7a;--s2:#2a78d6;--s3:#008300;--s4:#6250d6;--s5:#e87ba4;--trunk:#898781;--mine:#d9480f;--mine2:#7c2d12}}
 .link.mine{stroke-width:3.4}
 .link.mine-o{stroke-width:7.5}
-.node.me text{font-weight:700}
+
 .node text.gen{font:700 10px var(--ff);fill:var(--muted)}
 .node.root text.gen{font:700 11px var(--ff);fill:#3a1d00}
 #genBase{width:54px;font:inherit;font-size:12px;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:3px 4px}
@@ -866,7 +866,7 @@ function layout(){
   walk(root,n=>{
     n.w = n===root ? Math.max(96,tw(label(n)||' ','700 17px '+FF)+36) : Math.max(54,tw(label(n)||'(empty)','15px '+FF)+22);
   });
-  walk(root,n=>{ if(n.me) n.w+=20; });
+
   walk(root,n=>{ const y=yrs(n); n._yw=y?tw(' '+y,'11px '+FF)+2:0; n.w+=n._yw; });   // birth–death years after the name
   // generation = position in the tree (top person = GENBASE), recomputed on every render, never stored
   (function g(n,k){ n._g=GENBASE+k; n._gw=SHOWGEN?tw(String(n._g),'700 10px '+FF)+(n===root?12:8):0; n.w+=n._gw; n.children.forEach(c=>g(c,k+1)); })(root,0);
@@ -942,7 +942,7 @@ function render(){
     const t=el('text',isRoot?{x:n.x+n._gw+(n.w-n._gw)/2,y:n.y+6,'text-anchor':'middle'}:{x:n.x+8+n._gw,y:a-8},g);
     if(SHOWGEN){ const gt=el('text',{'class':'gen',x:n.x+(isRoot?10:4),y:isRoot?n.y+5:a-8},g); gt.textContent=n._g; }
     if(label(n)){ t.textContent=label(n); } else { t.textContent='(empty)'; t.setAttribute('class','empty'); }
-    if(n.me){ const st=document.createElementNS(NS,'tspan'); st.textContent='★ '; st.setAttribute('style','fill:var(--mine)'); t.insertBefore(st,t.firstChild); }
+    if(false){ const st=document.createElementNS(NS,'tspan'); st.textContent='★ '; st.setAttribute('style','fill:var(--mine)'); t.insertBefore(st,t.firstChild); }
     if(n._yw){ const ys=document.createElementNS(NS,'tspan'); ys.setAttribute('class','yrs'); ys.textContent=' '+yrs(n); t.appendChild(ys); }
     if(n.children.length){
       const cx=n.x+n.w+13;
@@ -1299,7 +1299,7 @@ function renderLegend(){
   let h='<div class="hd">Colours '+(legendMin?'▸':'▾')+'</div><div class="rows">';
   heads.forEach(n=>{ h+='<div class="row" data-go="'+n.id+'"><span class="sw2" style="background:var(--s'+headSlot[n.id]+')"></span>'+esc(lab(n))+' branch<span class="cnt">'+(descCount(n)+1)+'</span></div>'; });
   h+='<div class="row"><span class="sw2" style="background:var(--trunk)"></span>Ancestors &amp; smaller branches</div>';
-  const m=meNode(); if(m) h+='<div class="row" data-go="'+m.id+'"><span class="sw2" style="background:var(--mine);height:4px;box-shadow:0 0 0 2px var(--mine2)"></span>'+(TJ()?esc(lab(TJ()))+' family · ':'')+'★ '+esc(lab(m))+'</div>';
+  const m=meNode(); if(m) h+='<div class="row" data-go="'+m.id+'"><span class="sw2" style="background:var(--mine);height:4px;box-shadow:0 0 0 2px var(--mine2)"></span>'+(TJ()?esc(lab(TJ()))+' family · ':'')+esc(lab(m))+'</div>';
   L.innerHTML=h+'</div>'; L.classList.toggle('min',legendMin);
 }
 // hover bar: see-through buttons above the name under the pointer
