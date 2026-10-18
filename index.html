@@ -149,11 +149,30 @@ button.on{background:var(--sel);color:#fff;border-color:var(--sel)}
   #legend{max-width:190px;font-size:11px}
   #side{top:auto;height:62%;right:8px;left:8px;bottom:8px;width:auto}
 }
+/* welcome wallpaper: shown for 4 s after the picture loads; click / any key skips; removed if the picture is missing */
+#splash{position:fixed;inset:0;z-index:100;background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden;transition:opacity .7s ease;cursor:pointer}
+#splash.out{opacity:0;pointer-events:none}
+#splash .bg{position:absolute;inset:-40px;width:calc(100% + 80px);height:calc(100% + 80px);object-fit:cover;filter:blur(28px) brightness(.4)}
+#splash .fg{position:relative;max-width:100%;max-height:100%;object-fit:contain;box-shadow:0 0 60px rgba(0,0,0,.6)}
+#splash .cap{position:absolute;left:0;right:0;bottom:7%;text-align:center;font:800 clamp(22px,4.5vw,42px) var(--ff);color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.9)}
+#splash .skip{position:absolute;right:16px;top:16px;background:rgba(0,0,0,.45);color:#fff;border:1px solid rgba(255,255,255,.35);border-radius:20px;padding:5px 14px;font-size:13px}
 #ptr,#hov,#colors,#bImp,#bReset,#bJson,#bSetMe,[data-rmphoto]{display:none!important}
 .vo{font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:3px 8px}
 </style>
 </head>
 <body>
+<div id="splash" aria-label="Welcome"><img class="bg" alt="" src="wallpaper.jpg"><img class="fg" alt="" src="wallpaper.jpg"><div class="cap">🏹 The Raghuvanshi's</div><button class="skip" type="button">Skip ›</button></div>
+<script>
+(function(){
+  var s=document.getElementById('splash'), im=s.querySelector('.fg'), done=false, t;
+  function hide(){ if(done) return; done=true; clearTimeout(t); s.classList.add('out'); setTimeout(function(){ s.remove(); },800); }
+  im.addEventListener('error',function(){ done=true; s.remove(); });
+  s.addEventListener('click',hide); document.addEventListener('keydown',hide,{once:true});
+  function start(){ t=setTimeout(hide,4000); }
+  if(im.complete&&im.naturalWidth) start(); else im.addEventListener('load',start);
+  setTimeout(hide,9000);   // never longer than this, even on a very slow connection
+})();
+</script>
 <header>
   <span class="vo" title="Visitors can explore but not change this tree">👁 View only</span>
   <h1 id="title">🏹 The Raghuvanshi's · नयन देव</h1>
