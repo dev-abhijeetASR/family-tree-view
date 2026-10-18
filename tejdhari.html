@@ -1614,7 +1614,17 @@ try{ if(!localStorage.getItem(KEY+'-mig-sonu')){ let ch=0;
     else if(n.text==='रजनीश'){ n.text='रजनीश (मोनू)'; n.en='Rajnish (Monu)'; n.em=1; ch++; } });
   if(ch) persist(); localStorage.setItem(KEY+'-mig-sonu','1'); } }catch(e){}
 sel=root.id; index(); hist=[snap()]; hi=0; persist();
-render(); fit();
+// opening view (user request 2026-10-18): 67% zoom, तेजधारी placed where the user's reference screenshot had him
+// (69% across, 65% down the map area; on narrow phone screens 30% / 50%). Falls back to Fit if he is hidden or missing.
+const START_ZOOM=0.67;
+function startView(){
+  let n=null; walk(root,x=>{ if(!n&&x.text==='तेजधारी') n=x; });
+  let hidden=false; for(let p=n&&parentOf[n.id];p;p=parentOf[p.id]) if(p.collapsed) hidden=true;
+  if(!n||hidden||n.x==null){ fit(); return; }
+  const r=svg.getBoundingClientRect(), narrow=r.width<760;
+  T.k=START_ZOOM; T.x=r.width*(narrow?.3:.687)-T.k*n.x; T.y=r.height*(narrow?.5:.653)-T.k*anchorY(n); applyT();
+}
+render(); startView();
 })();
 </script>
 </body>
