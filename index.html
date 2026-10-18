@@ -1,0 +1,1584 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nayan Dev Family Tree</title>
+<meta name="robots" content="noindex,nofollow">
+<style>
+:root{--bg:#0e0f12;--panel:#171a20;--line:#2a2f39;--text:#e8eaef;--muted:#8b93a3;--accent:#ffbf00;--sel:#4da3ff;--ff:system-ui,-apple-system,"Segoe UI","Nirmala UI","Mangal",Roboto,sans-serif}
+@media (prefers-color-scheme: light){:root{--bg:#f6f7f9;--panel:#ffffff;--line:#d8dce3;--text:#1b1e24;--muted:#667085;--accent:#d99a00;--sel:#1a73e8}}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--text);font:14px/1.4 var(--ff);display:flex;flex-direction:column;overflow:hidden}
+header{background:var(--panel);border-bottom:1px solid var(--line);padding:8px 16px;display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+header h1{font-size:15px;margin:0 8px 0 0;font-weight:700}
+.grp{display:flex;gap:4px;align-items:center;padding-right:10px;border-right:1px solid var(--line)}
+.grp:last-child{border-right:0}
+button,input[type=search]{font:inherit;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:4px 9px;cursor:pointer}
+button:hover{border-color:var(--sel)}
+button:disabled{opacity:.4;cursor:default}
+input[type=search]{cursor:text;width:150px}
+.sw{width:20px;height:20px;padding:0;border-radius:50%;border:2px solid var(--panel);box-shadow:0 0 0 1px var(--line)}
+input[type=color]{width:26px;height:24px;padding:0;border:1px solid var(--line);border-radius:6px;background:none;cursor:pointer}
+#stage{position:relative;flex:1;min-height:0;overflow:hidden}
+#svg{width:100%;height:100%;display:block;touch-action:none;cursor:grab;user-select:none}
+#svg.panning{cursor:grabbing}
+.node .hit{fill:transparent;stroke:transparent;cursor:pointer}
+.node text{font:15px var(--ff);fill:var(--text);pointer-events:none}
+.node.root text{font:700 17px var(--ff);fill:#1b1300}
+.node text.empty{fill:var(--muted);font-style:italic}
+.node.sel .hit{stroke:var(--sel);stroke-width:1.6;stroke-dasharray:4 3}
+.node.match .hit{stroke:var(--accent);stroke-width:1.8}
+.node.flash .hit{stroke:var(--accent);stroke-width:3;stroke-dasharray:none;animation:flash 1.2s ease-out 2}
+@keyframes flash{0%{fill:rgba(255,191,0,.5)}100%{fill:transparent}}
+.node .hit.drop-child{stroke:var(--sel);stroke-width:2;stroke-dasharray:none;fill:rgba(77,163,255,.2)}
+.tog{fill:var(--bg);stroke-width:1.6;cursor:pointer}
+.togt{font:600 10px var(--ff)!important;fill:var(--muted)!important;text-anchor:middle;pointer-events:none}
+.link{fill:none;stroke-width:2.2;stroke-linecap:round}
+#editor{position:absolute;z-index:5;background:var(--panel);border:2px solid var(--sel);border-radius:8px;padding:4px;display:flex;flex-direction:column;gap:3px;box-shadow:0 6px 20px rgba(0,0,0,.35)}
+#editor input{font-family:var(--ff);color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:5px;padding:2px 6px;outline:none;width:100%}
+#editor input:focus{border-color:var(--sel)}
+#editor label{font-size:11px;color:var(--muted);padding:0 2px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:7px;overflow:hidden}
+.seg button{border:0;border-radius:0;padding:4px 10px}
+.seg button.on{background:var(--sel);color:#fff}
+.ghost{position:fixed;z-index:20;pointer-events:none;background:var(--sel);color:#fff;border-radius:6px;padding:2px 10px;font-size:13px;opacity:.9}
+footer{background:var(--panel);border-top:1px solid var(--line);padding:6px 16px;color:var(--muted);font-size:12px;display:flex;flex-wrap:wrap;gap:4px 18px}
+#crumb{color:var(--text)}
+#toast{position:fixed;left:50%;bottom:48px;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:6px 14px;border-radius:8px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:30}
+#toast.on{opacity:.95}
+/* branch hues: validated order (aqua, blue, green, violet, pink) – orange is reserved for "my line" */
+:root{--s1:#199e70;--s2:#3987e5;--s3:#008300;--s4:#9085e9;--s5:#d55181;--trunk:#8b93a3;--mine:#ff9f1a;--mine2:#c2410c}
+@media (prefers-color-scheme: light){:root{--s1:#1baf7a;--s2:#2a78d6;--s3:#008300;--s4:#6250d6;--s5:#e87ba4;--trunk:#898781;--mine:#d9480f;--mine2:#7c2d12}}
+.link.mine{stroke-width:3.4}
+.link.mine-o{stroke-width:7.5}
+.node.me text{font-weight:700}
+.node text.gen{font:700 10px var(--ff);fill:var(--muted)}
+.node.root text.gen{font:700 11px var(--ff);fill:#3a1d00}
+#genBase{width:54px;font:inherit;font-size:12px;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:3px 4px}
+.dim{opacity:.18}
+button.on{background:var(--sel);color:#fff;border-color:var(--sel)}
+#legend{position:absolute;left:12px;bottom:12px;z-index:4;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:12px;max-width:280px;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+#legend .hd{cursor:pointer;color:var(--muted);font-weight:600;user-select:none}
+#legend .rows{margin-top:4px}
+#legend.min .rows{display:none}
+#legend .row{display:flex;align-items:center;gap:8px;padding:2px 0;color:var(--text)}
+#legend .row[data-go]{cursor:pointer}
+#legend .row[data-go]:hover{color:var(--sel)}
+#legend .sw2{width:18px;height:4px;border-radius:2px;flex:none}
+#legend .cnt{color:var(--muted);margin-left:auto;padding-left:10px}
+#hov{position:absolute;z-index:6;display:none;gap:3px;padding:3px;border-radius:9px;background:rgba(23,26,32,.45);border:1px solid rgba(255,255,255,.14);transition:background .15s}
+#hov.on{display:flex}
+#hov:hover{background:rgba(23,26,32,.92)}
+#hov button{background:rgba(14,15,18,.35);font-size:12px;padding:2px 8px;white-space:nowrap}
+#hov:hover button{background:var(--bg)}
+@media (prefers-color-scheme: light){#hov{background:rgba(255,255,255,.5);border-color:rgba(0,0,0,.12)} #hov:hover{background:rgba(255,255,255,.95)} #hov button{background:rgba(255,255,255,.4)}}
+#ptr{position:relative;display:inline-block;outline:none}
+#ptr > span{cursor:help;font-size:13px;color:var(--accent);border:1px dashed var(--accent);border-radius:6px;padding:3px 9px;user-select:none;white-space:nowrap}
+#ptr .pop{display:none;position:absolute;left:0;top:100%;z-index:40;padding-top:6px}
+#ptr .card{width:min(500px,92vw);max-height:72vh;overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 14px;box-shadow:0 10px 30px rgba(0,0,0,.45);font-size:13px;line-height:1.5;color:var(--text)}
+#ptr:hover .pop,#ptr:focus-within .pop{display:block}
+#ptr h3{margin:0 0 6px;font-size:14px}
+#ptr ol{margin:0;padding-left:20px}
+#ptr li{margin:4px 0}
+#ptr b{color:var(--accent)}
+/* generation columns, details / stats side panel, relationship finder, export menu, phone layout */
+#ruler{position:absolute;left:0;right:0;top:0;height:24px;z-index:3;pointer-events:none;display:none}
+#ruler.on{display:block}
+#ruler span{position:absolute;top:4px;font:700 11px var(--ff);color:var(--muted);white-space:nowrap;background:var(--panel);border:1px solid var(--line);border-radius:5px;padding:0 6px}
+#ruler span.mine{color:var(--mine);border-color:var(--mine)}
+.colband{fill:var(--text);opacity:.04}
+.node text tspan.yrs{font-size:11px;font-weight:400;fill:var(--muted)}
+#side{position:absolute;right:12px;top:12px;bottom:12px;z-index:7;width:min(340px,calc(100% - 24px));background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.35);display:none;flex-direction:column;overflow:hidden}
+#side.on{display:flex}
+#side .sh{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--line);font-weight:700}
+#side .sh .x{margin-left:auto;padding:0 9px}
+#side .sb{overflow:auto;padding:10px 12px 14px;font-size:13px}
+#side label{display:block;font-size:11px;color:var(--muted);margin:9px 0 2px}
+#side input[type=text],#side textarea{width:100%;font:inherit;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:4px 7px;outline:none}
+#side input[type=text]:focus,#side textarea:focus{border-color:var(--sel)}
+#side textarea{min-height:72px;resize:vertical}
+#side a{color:var(--sel)}
+#side h4{margin:14px 0 5px;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+#side .two{display:flex;gap:8px}
+#side .two>div{flex:1;min-width:0}
+#side .photo{flex:none;width:92px;height:92px;border-radius:10px;border:1px dashed var(--line);display:flex;align-items:center;justify-content:center;overflow:hidden;color:var(--muted);font-size:12px;cursor:pointer}
+#side .photo:hover{border-color:var(--sel)}
+#side .photo img{width:100%;height:100%;object-fit:cover}
+#side .kpi{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+#side .kpi div{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:6px 8px}
+#side .kpi b{display:block;font-size:19px;font-variant-numeric:tabular-nums}
+#side .kpi span{font-size:11px;color:var(--muted)}
+#side .st-row{display:grid;grid-template-columns:54px 1fr 34px;gap:6px;align-items:center;padding:1px 0}
+#side .st-row:hover{background:var(--bg)}
+#side .st-bar{display:block;height:10px;border-radius:0 4px 4px 0;background:var(--s2)}
+#side .st-row.mine .st-bar{background:var(--mine)}
+#side .st-row.mine>span:first-child{color:var(--mine);font-weight:700}
+#side .st-n{text-align:right;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+#side .lst>div{display:flex;justify-content:space-between;gap:8px;padding:3px 0;border-bottom:1px solid var(--line)}
+#side .lst>div[data-go]{cursor:pointer}
+#side .lst>div[data-go]:hover{color:var(--sel)}
+#relbox{position:absolute;left:50%;top:12px;transform:translateX(-50%);z-index:8;background:var(--panel);border:2px solid var(--sel);border-radius:10px;padding:8px 14px;width:max-content;max-width:min(580px,calc(100% - 24px));display:none;box-shadow:0 8px 24px rgba(0,0,0,.35);font-size:13px;line-height:1.5}
+#relbox.on{display:block}
+#relbox .big{font-size:16px;color:var(--sel)}
+#relbox .x{float:right;margin-left:12px;padding:0 8px}
+.link.rel{stroke:var(--sel)!important;stroke-width:4.5}
+.node.rel .hit{stroke:var(--sel);stroke-width:2.4;stroke-dasharray:none;fill:rgba(77,163,255,.12)}
+.menu{position:relative;display:inline-block}
+.menu .mpop{display:none;position:absolute;left:0;top:100%;z-index:40;padding-top:4px}
+.menu:hover .mpop,.menu:focus-within .mpop{display:block}
+.menu .mcard{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:5px;display:flex;flex-direction:column;gap:4px;box-shadow:0 8px 24px rgba(0,0,0,.35);min-width:230px}
+.menu .mcard button{text-align:left}
+@media (max-width:760px){
+  header{max-height:38vh;overflow-y:auto;padding:6px 10px}
+  .grp{border-right:0;padding-right:0;flex-wrap:wrap}
+  button{padding:6px 10px}
+  #ptr .pop,.menu .mpop{position:fixed;left:8px;right:8px;top:52px}
+  #ptr .card{width:auto}
+  footer>span:nth-child(3){display:none}
+  #legend{max-width:190px;font-size:11px}
+  #side{top:auto;height:62%;right:8px;left:8px;bottom:8px;width:auto}
+}
+#ptr,#hov,#colors,#bImp,#bReset,#bJson,#bSetMe,[data-rmphoto]{display:none!important}
+.vo{font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:3px 8px}
+</style>
+</head>
+<body>
+<header>
+  <span class="vo" title="Visitors can explore but not change this tree">👁 View only</span>
+  <h1 id="title">नयन देव · Mind Map</h1>
+  <div id="ptr" tabindex="0" aria-label="Points to remember while editing"><span>📌 Points to remember</span><div class="pop"><div class="card"><h3>Points to remember while editing</h3><ol>
+<li><b>Select</b> a person by clicking the name. <b>Double-click</b> (or F2) to rename — <b>Enter</b> saves, <b>Esc</b> cancels.</li><li>Renaming shows <b>two boxes: Hindi and English</b>. The second one fills itself in — check its spelling before pressing Enter.</li><li>Hover over a name for quick buttons: <b>+ Child, + Sibling, + Parent, Rename, Remove</b>.</li>
+<li><b>A generation missing?</b> Select the person just below the gap and use <b>+ Parent</b>. Never type numbers into names — the generation numbers update by themselves.</li>
+<li><b>Remove</b> takes out only that person; their children move up to the parent. To delete a whole branch use <b>Shift+Delete</b> (it asks first).</li>
+<li>To move someone under a different father, <b>drag</b> the name onto the new father (drop on the top or bottom edge of a name to place beside it).</li>
+<li>Many names repeat in different families. Check the <b>generation number</b> and the path shown at the bottom before changing someone.</li>
+<li>Made a mistake? <b>Ctrl+Z</b> undoes, <b>Ctrl+Y</b> redoes.</li>
+<li>Changes save automatically, but <b>only in this browser on this computer</b>. Use <b>Export JSON</b> regularly as a backup; <b>Import</b> brings it back.</li>
+<li><b>Reset to original</b> throws away every edit and goes back to the copy from the phone — only if you are sure (Ctrl+Z still works right after).</li>
+<li>Colours come automatically from the family branch, and <b>orange is reserved for “my line”</b>. A colour swatch gives someone a custom colour; <b>Auto</b> removes it.</li>
+<li><b>★</b> marks “me”. <b>Set as me</b> moves it to the selected person, <b>★ Me</b> jumps to it, <b>My line</b> fades everyone else.</li><li><b>Columns</b> (C) puts each generation in its own column with a <b>Gen</b> ruler on top — handy to see who belongs to the same generation.</li>
+<li><b>Details</b> (I, or ⓘ in the hover buttons) keeps birth / death year, village, notes and a photo for the selected person. Years appear next to the name; photos are shrunk automatically and saved with the map.</li>
+<li><b>Relation</b> (R): select the first person, press Relation, then click the second person. The path between them lights up and the relation is named (e.g. “2nd cousin, once removed”). <b>Esc</b> clears it.</li>
+<li><b>Stats</b> shows people per generation and the largest families — click a name to jump there.</li>
+<li><b>Save / Export</b> makes a picture (PNG, for WhatsApp), a poster file (SVG) or <b>Print → Save as PDF</b>. It saves what is open on screen, so press <b>Expand all</b> first for the whole tree.</li>
+<li>On a phone or tablet: <b>pinch</b> to zoom, drag to pan, <b>tap</b> a name for the buttons, <b>double-tap</b> to rename.</li>
+<li>Keys: <b>L</b> हिंदी/English · <b>G</b> generation numbers · <b>+ / −</b> zoom · <b>Ctrl+F</b> search (Enter = next match) · <b>C</b> columns · <b>I</b> details · <b>R</b> relation · <b>Tab</b> add child · <b>Shift+Tab</b> add parent.</li>
+</ol></div></div></div>
+  <div class="grp"><div class="seg" title="Switch language (L)"><button id="lHi">हिंदी</button><button id="lEn">English</button></div></div>
+  <div class="grp">
+    <button id="bChild" title="Add child (Tab)">+ Child</button>
+    <button id="bSib" title="Add sibling (Enter)">+ Sibling</button>
+    <button id="bParent" title="Insert a new parent above the selected node (Shift+Tab)">+ Parent</button>
+    <button id="bEdit" title="Rename (F2 / double-click)">Rename</button>
+    <button id="bDel" title="Remove this person only — children move up (Delete). Shift+Delete removes the whole branch.">Remove</button>
+  </div>
+  <div class="grp">
+    <button id="bUp" title="Move up (Alt+↑)">↑</button>
+    <button id="bDown" title="Move down (Alt+↓)">↓</button>
+    <button id="bOut" title="Outdent (Alt+←)">⇤</button>
+    <button id="bIn" title="Indent under previous sibling (Alt+→)">⇥</button>
+  </div>
+  <div class="grp">
+    <button id="bMe" title="Jump to me">★ Me</button>
+    <button id="bSetMe" title="Mark the selected person as me">Set as me</button>
+    <button id="bFocus" title="Fade everyone who is not on my line">My line</button>
+    <button id="bGen" title="Show generation numbers (G)">Gen #</button>
+    <label style="font-size:12px;color:var(--muted)" title="Generation number of the person at the top of this map">from <input id="genBase" type="number" min="-99" max="999"></label>
+  </div>
+  <div class="grp">
+    <button id="bCols" title="Line up each generation in its own column, with a Gen ruler on top (C)">Columns</button>
+    <button id="bInfo" title="Birth / death year, village, notes and photo of the selected person (I)">Details</button>
+    <button id="bRel" title="How are two people related? Select one, press this, then click the other (R)">Relation</button>
+    <button id="bStats" title="People per generation, largest families">Stats</button>
+  </div>
+  <div class="grp" id="colors"><span style="color:var(--muted)">Colour</span></div>
+  <div class="grp">
+    <button id="bExp">Expand all</button>
+    <button id="bCol">Collapse all</button>
+    <button id="bZo" title="Zoom out (−)">−</button><span id="zl" style="min-width:42px;text-align:center;color:var(--muted);font-size:12px">100%</span><button id="bZi" title="Zoom in (+)">+</button>
+    <button id="bFit">Fit</button>
+  </div>
+  <div class="grp">
+    <button id="bUndo" title="Ctrl+Z">Undo</button>
+    <button id="bRedo" title="Ctrl+Y">Redo</button>
+  </div>
+  <div class="grp">
+    <div class="menu"><button id="bExpMenu" title="Backup, outline, picture, poster, PDF">Save / Export ▾</button><div class="mpop"><div class="mcard">
+      <button id="bJson" title="Download a portable backup you can re-import">Backup file (JSON)</button>
+      <button id="bMd" title="Plain indented list of names">Outline text</button>
+      <button id="bPng" title="Picture of what is open on screen — good for WhatsApp">Picture (PNG)</button>
+      <button id="bSvg" title="Sharp at any size — for a printed poster">Poster file (SVG)</button>
+      <button id="bPdf" title="Opens the print dialog — choose “Save as PDF”">Print / PDF</button>
+    </div></div></div>
+    <button id="bImp">Import</button>
+    <button id="bReset" title="Replace everything with the data originally read from the phone">Reset to original</button>
+    <input type="file" id="file" accept=".json,.txt,.md" hidden>
+  </div>
+  <div class="grp"><input type="search" id="search" placeholder="Search (Ctrl+F)"></div>
+</header>
+<div id="stage"><svg id="svg" xmlns="http://www.w3.org/2000/svg"><g id="view"></g></svg><div id="legend"></div><div id="ruler"></div><div id="side"></div><div id="relbox"></div><div id="hov"><button data-act="child" title="Add a child">+ Child</button><button data-act="sib" title="Add a brother/sister below">+ Sibling</button><button data-act="parent" title="Insert a parent above">+ Parent</button><button data-act="edit" title="Rename (or double-click the name)">✎ Rename</button><button data-act="info" title="Birth / death year, village, notes, photo">ⓘ Details</button><button data-act="del" title="Remove this person only — children move up">🗑 Remove</button></div></div>
+<footer>
+  <span id="crumb"></span><span id="count"></span>
+  <span>Click a name to select · scroll or + / − to zoom · drag to pan · search with Ctrl+F · Relation: select one person, press Relation, click another</span>
+  <span>View-only copy · updated 2026-10-18</span>
+</footer>
+<div id="toast"></div>
+
+<script>
+(function(){
+'use strict';
+
+/* ---- Data read from the phone's Notes app (note "नयन देव", outline view; verified 3x) ---- */
+const SEED = `नयन देव
+  शाल्हे कुँवर
+    नगई राव
+      देव कुँवर
+        भुज राय
+          गणेश राय
+            कील राय
+              खरग राय
+                राम देव
+                  नाहर शाह
+                    भरत राय
+                    छत्तू राय
+                      लाल साहब
+                        अज्ञात
+                          दरोगा
+                            रामरेज
+                              रमाशंकर
+                                प्रवीण
+                                  आयुष
+                                अश्वीन
+                                  अद्विक
+                              राजेश
+                                विपिन
+                                नीतिन
+                              शनि
+                                राम
+                                अंकुर
+                              अनिल
+                                आदर्श
+                                रोशन
+                              मनोज
+                                रौनक
+                              विनोद
+                                जतिन
+                            दयानंद
+                              अशोक
+                                आदेश
+                              सचिन
+                                योग्य प्रताप
+                          जयराम
+                            सूबेदार
+                            हवलदार
+                            उदयराज
+                        जगरदेव
+                          हरवंश
+                            सीताराम
+                              विजय
+                              ओमप्रकाश
+                              उमाशंकर
+                              लक्ष्मीशंकर
+                              हरिशंकर
+                            इंद्र बहादुर
+                              राधेश्याम
+                              घनश्याम
+                              महेश
+                            छेदी
+                            राम बदन
+                        कमला
+                          परमहंस
+                            मंगरू
+                              राज नरायण
+                                जयप्रकाश
+                                  आनंद
+                                    अमन
+                                    राका
+                                    साका
+                                  मनोज
+                                    अमित
+                                    सुमित
+                            नौबत
+                              राम अवध
+                                संजय
+                                  हिमांशु
+                                  शुभम
+                                ब्रजेश
+                                  आर्यन
+                                  यश
+                                अभिषेक
+                                  ईशान
+                                अमित
+                              श्यामसुंदर
+                            विक्रमा
+                              राम दरश
+                                राकेश
+                                  अभय
+                                  कृष्ण प्रताप
+                              राजेन्द्र
+                                प्रवीण
+                                  ललित
+                                भूपेन्द्र
+                                  आदित्य
+                              रामचन्द्र
+                                सतीश
+                                  किशन
+                              विजय प्रताप
+                                विवेक
+                                  प्रान्जल
+                                  चैतन्य
+                                नितेश
+                                  अखण्ड
+                                राहुल
+                                  सक्षम
+                                  आदर्श
+                      जगबंधा
+                        अलगू
+                          स्वारथ
+                            सुखपाल
+                              पंचदेव
+                                कौशल
+                                  सीजर
+                                    अगस्त्य
+                                  हेमंत
+                                राकेश
+                          सुख नंदन
+                            बाघ सदल
+                          नागेश्वर
+                        कुबेर
+                          रामविलास
+                        दशरथ
+                          लोकनाथ
+                            नरेंद्र
+                              आशुतोष
+                                प्रभात
+                                  भव्य
+                              दुर्गेश
+                                अनुपम
+                              योगेश
+                                आदित्य
+                                रुद्राक्ष
+                            वीरेन्द्र
+                              संजय
+                                हर्ष
+                              विवेक
+                                सक्षम
+                            समर बहादुर
+                            राजबहादुर
+                              अंकित
+                            जितेंद्र
+                              संदेश
+                          शिव मूर्ति
+                        द्वारिका
+                          बनवारी
+                            सुरेंद्र
+                              कृपाशंकर
+                                विनय
+                                हिमांशु
+                              उमाशंकर
+                                विकास
+                                  आयुष्मान
+                                प्रशांत
+                                  साहिल
+                                दीपक
+                      नवल शाह
+                        पहलू
+                          मयगर
+                            रुपा
+                            शिव दास
+                            राम चरित्र
+                              सकलदीप
+                                रामप्रीत
+                                  सभाजीत
+                                    सूर्य प्रकाश
+                                      सारांश
+                                    राम प्रकाश
+                                      सुयोग्य
+                                भगवती
+                                  दिनेश
+                                    अमित
+                                      अभिनव
+                                    प्रवीत
+                                  सुरेश
+                                    अभिषेक
+                                      आदित्य
+                                      दिव्यांश
+                                    प्रशांत
+                                इंद्रपति
+                                  आत्मा प्रकाश
+                                    आनंद
+                                      संकल्प
+                                      संस्कार
+                                    विमल
+                                सोमपति
+                                  विनोद
+                                    विभोर
+                              देव नाथ
+                                राम दवर
+                                  कुँवर अजीत
+                                    अमरकांत
+                                      आराध्य
+                                      अक्षांत
+                              देवनन्दन
+                                राम नारायण
+                                  प्रेम नारायण
+                                    सुधीर
+                                      आदित्य
+                                    सुनील
+                                      सिद्धार्थ
+                                  हृदय नारायण
+                                    देवेश
+                                    समीर
+                                  अजय नारायण
+                                    देवांग
+                                रामजग
+                                  राम आसरे
+                                    सदानंद
+                                      शुभ
+                                    नित्यानंद
+                                    अतुल
+                                  शिव प्रकाश
+                                    गौरव
+                                      रेवांश
+                                    सौरभ
+                                यदुवीर
+                                  विजेंद्र
+                                  राजेंद्र
+                                  देवेंद्र
+                                    अभ्युदय
+                                  सुरेंद्र
+                                    प्रणय
+                                दलजीत
+                                तेजधारी
+                                  रमेश
+                                    आशीष
+                                      विवान
+                                  राजेश
+                                    अवनीश
+                                      जय
+                                    रजनीश
+                                      अन्वित
+                                  राकेश
+                                    सत्यम
+                                    रुद्रांश
+                                  ब्रजेश
+                                    अभिजीत (शिवम)
+                                अमलदार
+                                  सत्यप्रकाश
+                                    विनीत
+                                      यशवीर
+                                  अरुण
+                                    आदर्श
+                                  मनोज
+                                    देवब्रत
+                                  अनिल
+                                    अमीय
+                                    हर्षवर्धन
+                          सुखई
+                        समझा
+                          भवानी
+                            दरबारी
+                              कुंजी
+                                गोरख
+                                  उदयराज
+                                    उमा शंकर
+                                      सुनील
+                                        उत्कर्ष
+                                      अतुल
+                                        ईशान
+                                      आलोक
+                                      अखिलेश
+                                        शौर्यांश
+                                        सक्षम
+                                    दुर्गा शंकर
+                                काशीनाथ
+                                बासदेव
+                              लाल बिहारी
+                                राम अधार
+                                  मर्यादा
+                                  गरीब
+                                    राजपत
+                                      राम बचन
+                                  कैलाश
+                                  बद्री
+                              विन्ध्येश्वरी
+                              काशी
+                            फुलवंता
+                              हीरा
+                                काली चरण
+                                  संकठा
+                                    अरविंद
+                                    मनोज
+                                      राहुल
+                                      बाबुल
+                                    जितेंद्र
+                                    अप्पू
+                                  राजेंद्र
+                              गंभीरा
+                            कुलवंता
+                              भरत
+                                सिरताज
+                                राम प्रसाद
+                                  शिव मूर्ति
+                                    विपिन
+                                      आदेश
+                                      पिंकू
+                                    दुष्यंत
+                                      अनूप
+                                      किशन
+                                    उमेश
+                                      उमंग
+                                      अंश
+                                    संदीप
+                                      आदर्श
+                                सूर्यबली
+                              श्रीनाथ
+                                नसीब
+                                  कमला
+                                  अवधू
+                                    इंद्रसेन
+                                      दीपक
+                                      शशांक
+                                      प्रशांत
+                                  नेवाज
+                              राम सुख
+                          थम्हन
+                            सल्हंता
+                              महाबल
+                                गोकुल
+                                  रमई
+                                    रमाशंकर
+                                      सतीश
+                                      अजित
+                                    गौरीशंकर
+                                      संजय
+                                        नीतिन
+                                      मनीष
+                                        निखिल
+                                      अखिलेश
+                                        तन्मय
+                                        मनमय
+                                      हेमन्त
+                                    हरिशंकर
+                                      प्रमीर
+                                        स्वयं
+                                      सचिन
+                                        विवान
+                                      शैलेश
+                                    दयाशंकर
+                                      अविनाश
+                                        अविचल
+                                      अवनीश
+                                        अविरल
+                                      अनुपम
+                                        अनुतय
+                                    पंचम
+                                      सर्वेश
+                                        अविकल
+                                  राम विलास
+                                  विजई
+                                गोपी
+                                भोला
+                                  कोमल
+                                  रामरक्षा
+                                    रामचंद्र
+                                      प्रमोद
+                                        सौरभ
+                                      विनोद
+                                        सुमित
+                                          वेदांश
+                                      विनय
+                                        सिद्धांत
+                                      विनीत
+                                  राम उग्रह
+                                दूधनाथ
+                              मीरा
+                                राम लौटन
+                                  राम बुझारत
+                                    प्रेम प्रकाश
+                                      प्रशांत
+                                        सिद्धार्थ
+                                    राघवेंद्र
+                                      प्रवीण
+                                        जयवीर
+                                        करमवीर
+                                    अरविंद
+                                      अभिनव
+                                      अभिनित
+                                  फौजदार
+                                    श्री प्रकाश
+                                      आनंद
+                                        ऋत्विक
+                                    यादवेंद्र
+                                      योगेश
+                                      रूपेश
+                                    कमलेश
+                                      शक्ति
+                                      बिंदुसार
+                                  जगदीश
+                                राम खेलावन
+                                ब्रह्मा
+                              हीरामन
+                                राम लखन
+                            अर्जुन
+                              जोखन
+                                अमलधारी
+                                  त्रिवेणी
+                              बेचन
+                              लोचन
+                              बदन
+                            जवन्ता
+                              सोबरन
+                                राम राज
+                                धर्मराज
+                                देवराज
+                          सुदीन
+                          सुदान
+                      पीतांबर शाह
+                  जोधा राय
+                  गोसाईदास
+                  गोबिंदराय
+                  विश्वंभर
+                  धनीराम
+                  हरभान शाह
+                  आलम शाह
+                  ज़र्राव शाह
+                  बलभद्र शाह
+                  श्याम धन
+                ईश्वर दास
+                  राय सिंह
+                  टोडरमल
+                    भूपाल सिंह
+                    भैयाराम
+                    जोउ
+                  माधवराव
+                    भीलन शाह
+                    हरखू राय
+                  रूप सिंह
+                    सूरज सिंह
+                    ख़ेमकर
+          रतन राय`;
+
+const KEY = 'nayandev-view-v1';
+const VIEW_DATA = "{\"text\":\"नयन देव\",\"en\":\"Nayan Dev\",\"children\":[{\"text\":\"शाल्हे कुँवर\",\"en\":\"Shalhe Kunvar\",\"children\":[{\"text\":\"नगई राव\",\"en\":\"Nagai Rao\",\"children\":[{\"text\":\"देव कुँवर\",\"en\":\"Dev Kunvar\",\"children\":[{\"text\":\"भुज राय\",\"en\":\"Bhuj Rai\",\"children\":[{\"text\":\"गणेश राय\",\"en\":\"Ganesh Rai\",\"children\":[{\"text\":\"कील राय\",\"en\":\"Keel Rai\",\"children\":[{\"text\":\"खरग राय\",\"en\":\"Kharag Rai\",\"children\":[{\"text\":\"राम देव\",\"en\":\"Ram Dev\",\"children\":[{\"text\":\"नाहर शाह\",\"en\":\"Nahar Shah\",\"children\":[{\"text\":\"भरत राय\",\"en\":\"Bharat Rai\",\"children\":[]},{\"text\":\"छत्तू राय\",\"en\":\"Chhattu Rai\",\"children\":[{\"text\":\"लाल साहब\",\"en\":\"Lal Sahab\",\"children\":[{\"text\":\"अज्ञात\",\"en\":\"Agyat\",\"children\":[{\"text\":\"दरोगा\",\"en\":\"Daroga\",\"children\":[{\"text\":\"रामरेज\",\"en\":\"Ramrej\",\"children\":[{\"text\":\"रमाशंकर\",\"en\":\"Ramashankar\",\"children\":[{\"text\":\"प्रवीण\",\"en\":\"Praveen\",\"children\":[{\"text\":\"आयुष\",\"en\":\"Ayush\",\"children\":[]}]},{\"text\":\"अश्वीन\",\"en\":\"Ashwin\",\"children\":[{\"text\":\"अद्विक\",\"en\":\"Advik\",\"children\":[]}]}]},{\"text\":\"राजेश\",\"en\":\"Rajesh\",\"children\":[{\"text\":\"विपिन\",\"en\":\"Vipin\",\"children\":[]},{\"text\":\"नीतिन\",\"en\":\"Nitin\",\"children\":[]}]},{\"text\":\"शनि\",\"en\":\"Shani\",\"children\":[{\"text\":\"राम\",\"en\":\"Ram\",\"children\":[]},{\"text\":\"अंकुर\",\"en\":\"Ankur\",\"children\":[]}]},{\"text\":\"अनिल\",\"en\":\"Anil\",\"children\":[{\"text\":\"आदर्श\",\"en\":\"Adarsh\",\"children\":[]},{\"text\":\"रोशन\",\"en\":\"Roshan\",\"children\":[]}]},{\"text\":\"मनोज\",\"en\":\"Manoj\",\"children\":[{\"text\":\"रौनक\",\"en\":\"Raunak\",\"children\":[]}]},{\"text\":\"विनोद\",\"en\":\"Vinod\",\"children\":[{\"text\":\"जतिन\",\"en\":\"Jatin\",\"children\":[]}]}]},{\"text\":\"दयानंद\",\"en\":\"Dayanand\",\"children\":[{\"text\":\"अशोक\",\"en\":\"Ashok\",\"children\":[{\"text\":\"आदेश\",\"en\":\"Adesh\",\"children\":[]}]},{\"text\":\"सचिन\",\"en\":\"Sachin\",\"children\":[{\"text\":\"योग्य प्रताप\",\"en\":\"Yogya Pratap\",\"children\":[]}]}]}]},{\"text\":\"जयराम\",\"en\":\"Jayram\",\"children\":[{\"text\":\"सूबेदार\",\"en\":\"Subedar\",\"children\":[]},{\"text\":\"हवलदार\",\"en\":\"Havaldar\",\"children\":[]},{\"text\":\"उदयराज\",\"en\":\"Udayraj\",\"children\":[]}]}]},{\"text\":\"जगरदेव\",\"en\":\"Jagardev\",\"children\":[{\"text\":\"हरवंश\",\"en\":\"Harvansh\",\"children\":[{\"text\":\"सीताराम\",\"en\":\"Sitaram\",\"children\":[{\"text\":\"विजय\",\"en\":\"Vijay\",\"children\":[]},{\"text\":\"ओमप्रकाश\",\"en\":\"Omprakash\",\"children\":[]},{\"text\":\"उमाशंकर\",\"en\":\"Umashankar\",\"children\":[]},{\"text\":\"लक्ष्मीशंकर\",\"en\":\"Lakshmishankar\",\"children\":[]},{\"text\":\"हरिशंकर\",\"en\":\"Harishankar\",\"children\":[]}]},{\"text\":\"इंद्र बहादुर\",\"en\":\"Indra Bahadur\",\"children\":[{\"text\":\"राधेश्याम\",\"en\":\"Radheshyam\",\"children\":[]},{\"text\":\"घनश्याम\",\"en\":\"Ghanshyam\",\"children\":[]},{\"text\":\"महेश\",\"en\":\"Mahesh\",\"children\":[]}]},{\"text\":\"छेदी\",\"en\":\"Chhedi\",\"children\":[]},{\"text\":\"राम बदन\",\"en\":\"Ram Badan\",\"children\":[]}]}]},{\"text\":\"कमला\",\"en\":\"Kamla\",\"children\":[{\"text\":\"परमहंस\",\"en\":\"Paramhans\",\"children\":[{\"text\":\"मंगरू\",\"en\":\"Mangru\",\"children\":[{\"text\":\"राज नरायण\",\"en\":\"Raj Narayan\",\"children\":[{\"text\":\"जयप्रकाश\",\"en\":\"Jayprakash\",\"children\":[{\"text\":\"आनंद\",\"en\":\"Anand\",\"children\":[{\"text\":\"अमन\",\"en\":\"Aman\",\"children\":[]},{\"text\":\"राका\",\"en\":\"Raka\",\"children\":[]},{\"text\":\"साका\",\"en\":\"Saka\",\"children\":[]}]},{\"text\":\"मनोज\",\"en\":\"Manoj\",\"children\":[{\"text\":\"अमित\",\"en\":\"Amit\",\"children\":[]},{\"text\":\"सुमित\",\"en\":\"Sumit\",\"children\":[]}]}]}]}]},{\"text\":\"नौबत\",\"en\":\"Naubat\",\"children\":[{\"text\":\"राम अवध\",\"en\":\"Ram Avadh\",\"children\":[{\"text\":\"संजय\",\"en\":\"Sanjay\",\"children\":[{\"text\":\"हिमांशु\",\"en\":\"Himanshu\",\"children\":[]},{\"text\":\"शुभम\",\"en\":\"Shubham\",\"children\":[]}]},{\"text\":\"ब्रजेश\",\"en\":\"Brajesh\",\"children\":[{\"text\":\"आर्यन\",\"en\":\"Aryan\",\"children\":[]},{\"text\":\"यश\",\"en\":\"Yash\",\"children\":[]}]},{\"text\":\"अभिषेक\",\"en\":\"Abhishek\",\"children\":[{\"text\":\"ईशान\",\"en\":\"Ishan\",\"children\":[]}]},{\"text\":\"अमित\",\"en\":\"Amit\",\"children\":[]}]},{\"text\":\"श्यामसुंदर\",\"en\":\"Shyamsundar\",\"children\":[]}]},{\"text\":\"विक्रमा\",\"en\":\"Vikrama\",\"children\":[{\"text\":\"राम दरश\",\"en\":\"Ram Darash\",\"children\":[{\"text\":\"राकेश\",\"en\":\"Rakesh\",\"children\":[{\"text\":\"अभय\",\"en\":\"Abhay\",\"children\":[]},{\"text\":\"कृष्ण प्रताप\",\"en\":\"Krishna Pratap\",\"children\":[]}]}]},{\"text\":\"राजेन्द्र\",\"en\":\"Rajendra\",\"children\":[{\"text\":\"प्रवीण\",\"en\":\"Praveen\",\"children\":[{\"text\":\"ललित\",\"en\":\"Lalit\",\"children\":[]}]},{\"text\":\"भूपेन्द्र\",\"en\":\"Bhupendra\",\"children\":[{\"text\":\"आदित्य\",\"en\":\"Aditya\",\"children\":[]}]}]},{\"text\":\"रामचन्द्र\",\"en\":\"Ramchandra\",\"children\":[{\"text\":\"सतीश\",\"en\":\"Satish\",\"children\":[{\"text\":\"किशन\",\"en\":\"Kishan\",\"children\":[]}]}]},{\"text\":\"विजय प्रताप\",\"en\":\"Vijay Pratap\",\"children\":[{\"text\":\"विवेक\",\"en\":\"Vivek\",\"children\":[{\"text\":\"प्रान्जल\",\"en\":\"Pranjal\",\"children\":[]},{\"text\":\"चैतन्य\",\"en\":\"Chaitanya\",\"children\":[]}]},{\"text\":\"नितेश\",\"en\":\"Nitesh\",\"children\":[{\"text\":\"अखण्ड\",\"en\":\"Akhand\",\"children\":[]}]},{\"text\":\"राहुल\",\"en\":\"Rahul\",\"children\":[{\"text\":\"सक्षम\",\"en\":\"Saksham\",\"children\":[]},{\"text\":\"आदर्श\",\"en\":\"Adarsh\",\"children\":[]}]}]}]}]}]}]},{\"text\":\"जगबंधा\",\"en\":\"Jagbandha\",\"children\":[{\"text\":\"अलगू\",\"en\":\"Algu\",\"children\":[{\"text\":\"स्वारथ\",\"en\":\"Swarath\",\"children\":[{\"text\":\"सुखपाल\",\"en\":\"Sukhpal\",\"children\":[{\"text\":\"पंचदेव\",\"en\":\"Panchdev\",\"children\":[{\"text\":\"कौशल\",\"en\":\"Kaushal\",\"children\":[{\"text\":\"सीजर\",\"en\":\"Seejar\",\"children\":[{\"text\":\"अगस्त्य\",\"en\":\"Agastya\",\"children\":[]}]},{\"text\":\"हेमंत\",\"en\":\"Hemant\",\"children\":[]}]},{\"text\":\"राकेश\",\"en\":\"Rakesh\",\"children\":[]}]}]}]},{\"text\":\"सुख नंदन\",\"en\":\"Sukh Nandan\",\"children\":[{\"text\":\"बाघ सदल\",\"en\":\"Bagh Sadal\",\"children\":[]}]},{\"text\":\"नागेश्वर\",\"en\":\"Nageshwar\",\"children\":[]}]},{\"text\":\"कुबेर\",\"en\":\"Kuber\",\"children\":[{\"text\":\"रामविलास\",\"en\":\"Ramvilas\",\"children\":[]}]},{\"text\":\"दशरथ\",\"en\":\"Dashrath\",\"children\":[{\"text\":\"लोकनाथ\",\"en\":\"Loknath\",\"children\":[{\"text\":\"नरेंद्र\",\"en\":\"Narendra\",\"children\":[{\"text\":\"आशुतोष\",\"en\":\"Ashutosh\",\"children\":[{\"text\":\"प्रभात\",\"en\":\"Prabhat\",\"children\":[{\"text\":\"भव्य\",\"en\":\"Bhavya\",\"children\":[]}]}]},{\"text\":\"दुर्गेश\",\"en\":\"Durgesh\",\"children\":[{\"text\":\"अनुपम\",\"en\":\"Anupam\",\"children\":[]}]},{\"text\":\"योगेश\",\"en\":\"Yogesh\",\"children\":[{\"text\":\"आदित्य\",\"en\":\"Aditya\",\"children\":[]},{\"text\":\"रुद्राक्ष\",\"en\":\"Rudraksh\",\"children\":[]}]}]},{\"text\":\"वीरेन्द्र\",\"en\":\"Veerendra\",\"children\":[{\"text\":\"संजय\",\"en\":\"Sanjay\",\"children\":[{\"text\":\"हर्ष\",\"en\":\"Harsh\",\"children\":[]}]},{\"text\":\"विवेक\",\"en\":\"Vivek\",\"children\":[{\"text\":\"सक्षम\",\"en\":\"Saksham\",\"children\":[]}]}]},{\"text\":\"समर बहादुर\",\"en\":\"Samar Bahadur\",\"children\":[]},{\"text\":\"राजबहादुर\",\"en\":\"Rajbahadur\",\"children\":[{\"text\":\"अंकित\",\"en\":\"Ankit\",\"children\":[]}]},{\"text\":\"जितेंद्र\",\"en\":\"Jitendra\",\"children\":[{\"text\":\"संदेश\",\"en\":\"Sandesh\",\"children\":[]}]}]},{\"text\":\"शिव मूर्ति\",\"en\":\"Shiv Murti\",\"children\":[]}]},{\"text\":\"द्वारिका\",\"en\":\"Dwarika\",\"children\":[{\"text\":\"बनवारी\",\"en\":\"Banvari\",\"children\":[{\"text\":\"सुरेंद्र\",\"en\":\"Surendra\",\"children\":[{\"text\":\"कृपाशंकर\",\"en\":\"Kripashankar\",\"children\":[{\"text\":\"विनय\",\"en\":\"Vinay\",\"children\":[]},{\"text\":\"हिमांशु\",\"en\":\"Himanshu\",\"children\":[]}]},{\"text\":\"उमाशंकर\",\"en\":\"Umashankar\",\"children\":[{\"text\":\"विकास\",\"en\":\"Vikas\",\"children\":[{\"text\":\"आयुष्मान\",\"en\":\"Ayushman\",\"children\":[]}]},{\"text\":\"प्रशांत\",\"en\":\"Prashant\",\"children\":[{\"text\":\"साहिल\",\"en\":\"Sahil\",\"children\":[]}]},{\"text\":\"दीपक\",\"en\":\"Deepak\",\"children\":[]}]}]}]}]}]},{\"text\":\"नवल शाह\",\"en\":\"Naval Shah\",\"children\":[{\"text\":\"पहलू\",\"en\":\"Pahlu\",\"children\":[{\"text\":\"मयगर\",\"en\":\"Maygar\",\"children\":[{\"text\":\"रुपा\",\"en\":\"Rupa\",\"children\":[]},{\"text\":\"शिव दास\",\"en\":\"Shiv Das\",\"children\":[]},{\"text\":\"राम चरित्र\",\"en\":\"Ram Charitra\",\"children\":[{\"text\":\"सकलदीप\",\"en\":\"Sakaldeep\",\"children\":[{\"text\":\"रामप्रीत\",\"en\":\"Rampreet\",\"children\":[{\"text\":\"सभाजीत\",\"en\":\"Sabhajeet\",\"children\":[{\"text\":\"सूर्य प्रकाश\",\"en\":\"Surya Prakash\",\"children\":[{\"text\":\"सारांश\",\"en\":\"Saransh\",\"children\":[]}]},{\"text\":\"राम प्रकाश\",\"en\":\"Ram Prakash\",\"children\":[{\"text\":\"सुयोग्य\",\"en\":\"Suyogya\",\"children\":[]}]}]}]},{\"text\":\"भगवती\",\"en\":\"Bhagvati\",\"children\":[{\"text\":\"दिनेश\",\"en\":\"Dinesh\",\"children\":[{\"text\":\"अमित\",\"en\":\"Amit\",\"children\":[{\"text\":\"अभिनव\",\"en\":\"Abhinav\",\"children\":[]}]},{\"text\":\"प्रवीत\",\"en\":\"Praveet\",\"children\":[]}]},{\"text\":\"सुरेश\",\"en\":\"Suresh\",\"children\":[{\"text\":\"अभिषेक\",\"en\":\"Abhishek\",\"children\":[{\"text\":\"आदित्य\",\"en\":\"Aditya\",\"children\":[]},{\"text\":\"दिव्यांश\",\"en\":\"Divyansh\",\"children\":[]}]},{\"text\":\"प्रशांत\",\"en\":\"Prashant\",\"children\":[]}]}]},{\"text\":\"इंद्रपति\",\"en\":\"Indrapati\",\"children\":[{\"text\":\"आत्मा प्रकाश\",\"en\":\"Atma Prakash\",\"children\":[{\"text\":\"आनंद\",\"en\":\"Anand\",\"children\":[{\"text\":\"संकल्प\",\"en\":\"Sankalp\",\"children\":[]},{\"text\":\"संस्कार\",\"en\":\"Sanskar\",\"children\":[]}]},{\"text\":\"विमल\",\"en\":\"Vimal\",\"children\":[]}]}]},{\"text\":\"सोमपति\",\"en\":\"Sompati\",\"children\":[{\"text\":\"विनोद\",\"en\":\"Vinod\",\"children\":[{\"text\":\"विभोर\",\"en\":\"Vibhor\",\"children\":[]}]}]}]},{\"text\":\"देव नाथ\",\"en\":\"Dev Nath\",\"children\":[{\"text\":\"राम दवर\",\"en\":\"Ram Davar\",\"children\":[{\"text\":\"कुँवर अजीत\",\"en\":\"Kunvar Ajeet\",\"children\":[{\"text\":\"अमरकांत\",\"en\":\"Amarkant\",\"children\":[{\"text\":\"आराध्य\",\"en\":\"Aradhya\",\"children\":[]},{\"text\":\"अक्षांत\",\"en\":\"Akshant\",\"children\":[]}]}]}]}]},{\"text\":\"देवनन्दन\",\"en\":\"Devnandan\",\"children\":[{\"text\":\"राम नारायण\",\"en\":\"Ram Narayan\",\"children\":[{\"text\":\"प्रेम नारायण\",\"en\":\"Prem Narayan\",\"children\":[{\"text\":\"सुधीर\",\"en\":\"Sudheer\",\"children\":[{\"text\":\"आदित्य\",\"en\":\"Aditya\",\"children\":[]}]},{\"text\":\"सुनील\",\"en\":\"Suneel\",\"children\":[{\"text\":\"सिद्धार्थ\",\"en\":\"Siddharth\",\"children\":[]}]}]},{\"text\":\"हृदय नारायण\",\"en\":\"Hriday Narayan\",\"children\":[{\"text\":\"देवेश\",\"en\":\"Devesh\",\"children\":[]},{\"text\":\"समीर\",\"en\":\"Sameer\",\"children\":[]}]},{\"text\":\"अजय नारायण\",\"en\":\"Ajay Narayan\",\"children\":[{\"text\":\"देवांग\",\"en\":\"Devang\",\"children\":[]}]}]},{\"text\":\"रामजग\",\"en\":\"Ramjag\",\"children\":[{\"text\":\"राम आसरे\",\"en\":\"Ram Asare\",\"children\":[{\"text\":\"सदानंद\",\"en\":\"Sadanand\",\"children\":[{\"text\":\"शुभ\",\"en\":\"Shubh\",\"children\":[]}]},{\"text\":\"नित्यानंद\",\"en\":\"Nityanand\",\"children\":[]},{\"text\":\"अतुल\",\"en\":\"Atul\",\"children\":[]}]},{\"text\":\"शिव प्रकाश\",\"en\":\"Shiv Prakash\",\"children\":[{\"text\":\"गौरव\",\"en\":\"Gaurav\",\"children\":[{\"text\":\"रेवांश\",\"en\":\"Revansh\",\"children\":[]}]},{\"text\":\"सौरभ\",\"en\":\"Saurabh\",\"children\":[]}]}]},{\"text\":\"यदुवीर\",\"en\":\"Yaduveer\",\"children\":[{\"text\":\"विजेंद्र\",\"en\":\"Vijendra\",\"children\":[]},{\"text\":\"राजेंद्र\",\"en\":\"Rajendra\",\"children\":[]},{\"text\":\"देवेंद्र\",\"en\":\"Devendra\",\"children\":[{\"text\":\"अभ्युदय\",\"en\":\"Abhyuday\",\"children\":[]}]},{\"text\":\"सुरेंद्र\",\"en\":\"Surendra\",\"children\":[{\"text\":\"प्रणय\",\"en\":\"Pranay\",\"children\":[]}]}]},{\"text\":\"दलजीत\",\"en\":\"Daljeet\",\"children\":[]},{\"text\":\"तेजधारी\",\"en\":\"Tejdhari\",\"children\":[{\"text\":\"रमेश\",\"en\":\"Ramesh\",\"children\":[{\"text\":\"आशीष\",\"en\":\"Ashish\",\"children\":[{\"text\":\"विवान\",\"en\":\"Vivan\",\"children\":[]}]}]},{\"text\":\"राजेशकुमार\",\"en\":\"Rajeshkumar\",\"children\":[{\"text\":\"अवनीश\",\"en\":\"Avneesh\",\"children\":[{\"text\":\"जय\",\"en\":\"Jay\",\"children\":[]}]},{\"text\":\"रजनीश\",\"en\":\"Rajneesh\",\"children\":[{\"text\":\"अन्वित\",\"en\":\"Anvit\",\"children\":[]}]}]},{\"text\":\"राकेशकुमार\",\"en\":\"Rakeshkumar\",\"children\":[{\"text\":\"सत्यम\",\"en\":\"Satyam\",\"children\":[]},{\"text\":\"रुद्रांश\",\"en\":\"Rudransh\",\"children\":[]}]},{\"text\":\"ब्रजेशकुमार\",\"en\":\"Brajeshkumar\",\"children\":[{\"text\":\"अभिजीत (शिवम)\",\"en\":\"Abhijeet (Shivam)\",\"em\":1,\"me\":1,\"children\":[]}]}]},{\"text\":\"अमलदार\",\"en\":\"Amaldar\",\"children\":[{\"text\":\"सत्यप्रकाश\",\"en\":\"Satyaprakash\",\"children\":[{\"text\":\"विनीत\",\"en\":\"Vineet\",\"children\":[{\"text\":\"यशवीर\",\"en\":\"Yashveer\",\"children\":[]}]}]},{\"text\":\"अरुण\",\"en\":\"Arun\",\"children\":[{\"text\":\"आदर्श\",\"en\":\"Adarsh\",\"children\":[]}]},{\"text\":\"मनोज\",\"en\":\"Manoj\",\"children\":[{\"text\":\"देवब्रत\",\"en\":\"Devbrat\",\"children\":[]}]},{\"text\":\"अनिल\",\"en\":\"Anil\",\"children\":[{\"text\":\"अमीय\",\"en\":\"Amiy\",\"children\":[]},{\"text\":\"हर्षवर्धन\",\"en\":\"Harshvardhan\",\"children\":[]}]}]}]}]}]},{\"text\":\"सुखई\",\"en\":\"Sukhai\",\"children\":[]}]},{\"text\":\"समझा\",\"en\":\"Samjha\",\"children\":[{\"text\":\"भवानी\",\"en\":\"Bhavani\",\"children\":[{\"text\":\"दरबारी\",\"en\":\"Darbari\",\"children\":[{\"text\":\"कुंजी\",\"en\":\"Kunji\",\"children\":[{\"text\":\"गोरख\",\"en\":\"Gorakh\",\"children\":[{\"text\":\"उदयराज\",\"en\":\"Udayraj\",\"children\":[{\"text\":\"उमा शंकर\",\"en\":\"Uma Shankar\",\"children\":[{\"text\":\"सुनील\",\"en\":\"Suneel\",\"children\":[{\"text\":\"उत्कर्ष\",\"en\":\"Utkarsh\",\"children\":[]}]},{\"text\":\"अतुल\",\"en\":\"Atul\",\"children\":[{\"text\":\"ईशान\",\"en\":\"Ishan\",\"children\":[]}]},{\"text\":\"आलोक\",\"en\":\"Alok\",\"children\":[]},{\"text\":\"अखिलेश\",\"en\":\"Akhilesh\",\"children\":[{\"text\":\"शौर्यांश\",\"en\":\"Shauryansh\",\"children\":[]},{\"text\":\"सक्षम\",\"en\":\"Saksham\",\"children\":[]}]}]},{\"text\":\"दुर्गा शंकर\",\"en\":\"Durga Shankar\",\"children\":[]}]}]},{\"text\":\"काशीनाथ\",\"en\":\"Kashinath\",\"children\":[]},{\"text\":\"बासदेव\",\"en\":\"Basdev\",\"children\":[]}]},{\"text\":\"लाल बिहारी\",\"en\":\"Lal Bihari\",\"children\":[{\"text\":\"राम अधार\",\"en\":\"Ram Adhar\",\"children\":[{\"text\":\"मर्यादा\",\"en\":\"Maryada\",\"children\":[]},{\"text\":\"गरीब\",\"en\":\"Gareeb\",\"children\":[{\"text\":\"राजपत\",\"en\":\"Rajpat\",\"children\":[{\"text\":\"राम बचन\",\"en\":\"Ram Bachan\",\"children\":[]}]}]},{\"text\":\"कैलाश\",\"en\":\"Kailash\",\"children\":[]},{\"text\":\"बद्री\",\"en\":\"Badri\",\"children\":[]}]}]},{\"text\":\"विन्ध्येश्वरी\",\"en\":\"Vindhyeshwari\",\"children\":[]},{\"text\":\"काशी\",\"en\":\"Kashi\",\"children\":[]}]},{\"text\":\"फुलवंता\",\"en\":\"Phulvanta\",\"children\":[{\"text\":\"हीरा\",\"en\":\"Heera\",\"children\":[{\"text\":\"काली चरण\",\"en\":\"Kali Charan\",\"children\":[{\"text\":\"संकठा\",\"en\":\"Sanktha\",\"children\":[{\"text\":\"अरविंद\",\"en\":\"Arvind\",\"children\":[]},{\"text\":\"मनोज\",\"en\":\"Manoj\",\"children\":[{\"text\":\"राहुल\",\"en\":\"Rahul\",\"children\":[]},{\"text\":\"बाबुल\",\"en\":\"Babul\",\"children\":[]}]},{\"text\":\"जितेंद्र\",\"en\":\"Jitendra\",\"children\":[]},{\"text\":\"अप्पू\",\"en\":\"Appu\",\"children\":[]}]},{\"text\":\"राजेंद्र\",\"en\":\"Rajendra\",\"children\":[]}]}]},{\"text\":\"गंभीरा\",\"en\":\"Gambhira\",\"children\":[]}]},{\"text\":\"कुलवंता\",\"en\":\"Kulvanta\",\"children\":[{\"text\":\"भरत\",\"en\":\"Bharat\",\"children\":[{\"text\":\"सिरताज\",\"en\":\"Sirtaj\",\"children\":[]},{\"text\":\"राम प्रसाद\",\"en\":\"Ram Prasad\",\"children\":[{\"text\":\"शिव मूर्ति\",\"en\":\"Shiv Murti\",\"children\":[{\"text\":\"विपिन\",\"en\":\"Vipin\",\"children\":[{\"text\":\"आदेश\",\"en\":\"Adesh\",\"children\":[]},{\"text\":\"पिंकू\",\"en\":\"Pinku\",\"children\":[]}]},{\"text\":\"दुष्यंत\",\"en\":\"Dushyant\",\"children\":[{\"text\":\"अनूप\",\"en\":\"Anup\",\"children\":[]},{\"text\":\"किशन\",\"en\":\"Kishan\",\"children\":[]}]},{\"text\":\"उमेश\",\"en\":\"Umesh\",\"children\":[{\"text\":\"उमंग\",\"en\":\"Umang\",\"children\":[]},{\"text\":\"अंश\",\"en\":\"Ansh\",\"children\":[]}]},{\"text\":\"संदीप\",\"en\":\"Sandeep\",\"children\":[{\"text\":\"आदर्श\",\"en\":\"Adarsh\",\"children\":[]}]}]}]},{\"text\":\"सूर्यबली\",\"en\":\"Suryabali\",\"children\":[]}]},{\"text\":\"श्रीनाथ\",\"en\":\"Shrinath\",\"children\":[{\"text\":\"नसीब\",\"en\":\"Naseeb\",\"children\":[{\"text\":\"कमला\",\"en\":\"Kamla\",\"children\":[]},{\"text\":\"अवधू\",\"en\":\"Avdhu\",\"children\":[{\"text\":\"इंद्रसेन\",\"en\":\"Indrasen\",\"children\":[{\"text\":\"दीपक\",\"en\":\"Deepak\",\"children\":[]},{\"text\":\"शशांक\",\"en\":\"Shashank\",\"children\":[]},{\"text\":\"प्रशांत\",\"en\":\"Prashant\",\"children\":[]}]}]},{\"text\":\"नेवाज\",\"en\":\"Nevaj\",\"children\":[]}]}]},{\"text\":\"राम सुख\",\"en\":\"Ram Sukh\",\"children\":[]}]}]},{\"text\":\"थम्हन\",\"en\":\"Thamhan\",\"children\":[{\"text\":\"सल्हंता\",\"en\":\"Salhanta\",\"children\":[{\"text\":\"महाबल\",\"en\":\"Mahabal\",\"children\":[{\"text\":\"गोकुल\",\"en\":\"Gokul\",\"children\":[{\"text\":\"रमई\",\"en\":\"Ramai\",\"children\":[{\"text\":\"रमाशंकर\",\"en\":\"Ramashankar\",\"children\":[{\"text\":\"सतीश\",\"en\":\"Satish\",\"children\":[]},{\"text\":\"अजित\",\"en\":\"Ajit\",\"children\":[]}]},{\"text\":\"गौरीशंकर\",\"en\":\"Gaurishankar\",\"children\":[{\"text\":\"संजय\",\"en\":\"Sanjay\",\"children\":[{\"text\":\"नीतिन\",\"en\":\"Nitin\",\"children\":[]}]},{\"text\":\"मनीष\",\"en\":\"Manish\",\"children\":[{\"text\":\"निखिल\",\"en\":\"Nikhil\",\"children\":[]}]},{\"text\":\"अखिलेश\",\"en\":\"Akhilesh\",\"children\":[{\"text\":\"तन्मय\",\"en\":\"Tanmay\",\"children\":[]},{\"text\":\"मनमय\",\"en\":\"Manmay\",\"children\":[]}]},{\"text\":\"हेमन्त\",\"en\":\"Hemant\",\"children\":[]}]},{\"text\":\"हरिशंकर\",\"en\":\"Harishankar\",\"children\":[{\"text\":\"प्रमीर\",\"en\":\"Prameer\",\"children\":[{\"text\":\"स्वयं\",\"en\":\"Swayam\",\"children\":[]}]},{\"text\":\"सचिन\",\"en\":\"Sachin\",\"children\":[{\"text\":\"विवान\",\"en\":\"Vivan\",\"children\":[]}]},{\"text\":\"शैलेश\",\"en\":\"Shailesh\",\"children\":[]}]},{\"text\":\"दयाशंकर\",\"en\":\"Dayashankar\",\"children\":[{\"text\":\"अविनाश\",\"en\":\"Avinash\",\"children\":[{\"text\":\"अविचल\",\"en\":\"Avichal\",\"children\":[]}]},{\"text\":\"अवनीश\",\"en\":\"Avneesh\",\"children\":[{\"text\":\"अविरल\",\"en\":\"Aviral\",\"children\":[]}]},{\"text\":\"अनुपम\",\"en\":\"Anupam\",\"children\":[{\"text\":\"अनुतय\",\"en\":\"Anutay\",\"children\":[]}]}]},{\"text\":\"पंचम\",\"en\":\"Pancham\",\"children\":[{\"text\":\"सर्वेश\",\"en\":\"Sarvesh\",\"children\":[{\"text\":\"अविकल\",\"en\":\"Avikal\",\"children\":[]}]}]}]},{\"text\":\"राम विलास\",\"en\":\"Ram Vilas\",\"children\":[]},{\"text\":\"विजई\",\"en\":\"Vijai\",\"children\":[]}]},{\"text\":\"गोपी\",\"en\":\"Gopi\",\"children\":[]},{\"text\":\"भोला\",\"en\":\"Bhola\",\"children\":[{\"text\":\"कोमल\",\"en\":\"Komal\",\"children\":[]},{\"text\":\"रामरक्षा\",\"en\":\"Ramraksha\",\"children\":[{\"text\":\"रामचंद्र\",\"en\":\"Ramchandra\",\"children\":[{\"text\":\"प्रमोद\",\"en\":\"Pramod\",\"children\":[{\"text\":\"सौरभ\",\"en\":\"Saurabh\",\"children\":[]}]},{\"text\":\"विनोद\",\"en\":\"Vinod\",\"children\":[{\"text\":\"सुमित\",\"en\":\"Sumit\",\"children\":[{\"text\":\"वेदांश\",\"en\":\"Vedansh\",\"children\":[]}]}]},{\"text\":\"विनय\",\"en\":\"Vinay\",\"children\":[{\"text\":\"सिद्धांत\",\"en\":\"Siddhant\",\"children\":[]}]},{\"text\":\"विनीत\",\"en\":\"Vineet\",\"children\":[]}]}]},{\"text\":\"राम उग्रह\",\"en\":\"Ram Ugrah\",\"children\":[]}]},{\"text\":\"दूधनाथ\",\"en\":\"Dudhnath\",\"children\":[]}]},{\"text\":\"मीरा\",\"en\":\"Meera\",\"children\":[{\"text\":\"राम लौटन\",\"en\":\"Ram Lautan\",\"children\":[{\"text\":\"राम बुझारत\",\"en\":\"Ram Bujharat\",\"children\":[{\"text\":\"प्रेम प्रकाश\",\"en\":\"Prem Prakash\",\"children\":[{\"text\":\"प्रशांत\",\"en\":\"Prashant\",\"children\":[{\"text\":\"सिद्धार्थ\",\"en\":\"Siddharth\",\"children\":[]}]}]},{\"text\":\"राघवेंद्र\",\"en\":\"Raghvendra\",\"children\":[{\"text\":\"प्रवीण\",\"en\":\"Praveen\",\"children\":[{\"text\":\"जयवीर\",\"en\":\"Jayveer\",\"children\":[]},{\"text\":\"करमवीर\",\"en\":\"Karamveer\",\"children\":[]}]}]},{\"text\":\"अरविंद\",\"en\":\"Arvind\",\"children\":[{\"text\":\"अभिनव\",\"en\":\"Abhinav\",\"children\":[]},{\"text\":\"अभिनित\",\"en\":\"Abhinit\",\"children\":[]}]}]},{\"text\":\"फौजदार\",\"en\":\"Phaujdar\",\"children\":[{\"text\":\"श्री प्रकाश\",\"en\":\"Shri Prakash\",\"children\":[{\"text\":\"आनंद\",\"en\":\"Anand\",\"children\":[{\"text\":\"ऋत्विक\",\"en\":\"Ritvik\",\"children\":[]}]}]},{\"text\":\"यादवेंद्र\",\"en\":\"Yadvendra\",\"children\":[{\"text\":\"योगेश\",\"en\":\"Yogesh\",\"children\":[]},{\"text\":\"रूपेश\",\"en\":\"Rupesh\",\"children\":[]}]},{\"text\":\"कमलेश\",\"en\":\"Kamlesh\",\"children\":[{\"text\":\"शक्ति\",\"en\":\"Shakti\",\"children\":[]},{\"text\":\"बिंदुसार\",\"en\":\"Bindusar\",\"children\":[]}]}]},{\"text\":\"जगदीश\",\"en\":\"Jagdish\",\"children\":[]}]},{\"text\":\"राम खेलावन\",\"en\":\"Ram Khelavan\",\"children\":[]},{\"text\":\"ब्रह्मा\",\"en\":\"Brahma\",\"children\":[]}]},{\"text\":\"हीरामन\",\"en\":\"Heeraman\",\"children\":[{\"text\":\"राम लखन\",\"en\":\"Ram Lakhan\",\"children\":[]}]}]},{\"text\":\"अर्जुन\",\"en\":\"Arjun\",\"children\":[{\"text\":\"जोखन\",\"en\":\"Jokhan\",\"children\":[{\"text\":\"अमलधारी\",\"en\":\"Amaldhari\",\"children\":[{\"text\":\"त्रिवेणी\",\"en\":\"Triveni\",\"children\":[]}]}]},{\"text\":\"बेचन\",\"en\":\"Bechan\",\"children\":[]},{\"text\":\"लोचन\",\"en\":\"Lochan\",\"children\":[]},{\"text\":\"बदन\",\"en\":\"Badan\",\"children\":[]}]},{\"text\":\"जवन्ता\",\"en\":\"Javanta\",\"children\":[{\"text\":\"सोबरन\",\"en\":\"Sobran\",\"children\":[{\"text\":\"राम राज\",\"en\":\"Ram Raj\",\"children\":[]},{\"text\":\"धर्मराज\",\"en\":\"Dharmaraj\",\"children\":[]},{\"text\":\"देवराज\",\"en\":\"Devraj\",\"children\":[]}]}]}]},{\"text\":\"सुदीन\",\"en\":\"Sudeen\",\"children\":[]},{\"text\":\"सुदान\",\"en\":\"Sudan\",\"children\":[]}]}]},{\"text\":\"पीतांबर शाह\",\"en\":\"Pitambar Shah\",\"children\":[]}]}]},{\"text\":\"जोधा राय\",\"en\":\"Jodha Rai\",\"children\":[]},{\"text\":\"गोसाईदास\",\"en\":\"Gosaidas\",\"children\":[]},{\"text\":\"गोबिंदराय\",\"en\":\"Gobindrai\",\"children\":[]},{\"text\":\"विश्वंभर\",\"en\":\"Vishwambhar\",\"children\":[]},{\"text\":\"धनीराम\",\"en\":\"Dhaniram\",\"children\":[]},{\"text\":\"हरभान शाह\",\"en\":\"Harbhan Shah\",\"children\":[]},{\"text\":\"आलम शाह\",\"en\":\"Alam Shah\",\"children\":[]},{\"text\":\"ज़र्राव शाह\",\"en\":\"Zarrav Shah\",\"children\":[]},{\"text\":\"बलभद्र शाह\",\"en\":\"Balbhadra Shah\",\"children\":[]},{\"text\":\"श्याम धन\",\"en\":\"Shyam Dhan\",\"children\":[]}]},{\"text\":\"ईश्वर दास\",\"en\":\"Ishwar Das\",\"children\":[{\"text\":\"राय सिंह\",\"en\":\"Rai Singh\",\"children\":[]},{\"text\":\"टोडरमल\",\"en\":\"Todarmal\",\"children\":[{\"text\":\"भूपाल सिंह\",\"en\":\"Bhupal Singh\",\"children\":[]},{\"text\":\"भैयाराम\",\"en\":\"Bhaiyaram\",\"children\":[]},{\"text\":\"जोउ\",\"en\":\"Jou\",\"children\":[]}]},{\"text\":\"माधवराव\",\"en\":\"Madhavrao\",\"children\":[{\"text\":\"भीलन शाह\",\"en\":\"Bhilan Shah\",\"children\":[]},{\"text\":\"हरखू राय\",\"en\":\"Harkhu Rai\",\"children\":[]}]},{\"text\":\"रूप सिंह\",\"en\":\"Rup Singh\",\"children\":[{\"text\":\"सूरज सिंह\",\"en\":\"Suraj Singh\",\"children\":[]},{\"text\":\"ख़ेमकर\",\"en\":\"Khemkar\",\"children\":[]}]}]}]}]}]},{\"text\":\"रतन राय\",\"en\":\"Ratan Rai\",\"children\":[]}]}]}]}]}]}";
+function RO(){ toast('This is a view-only copy of the family tree'); return true; }
+const PALETTE = ['#f5b301','#ff7a59','#4cc38a','#4da3ff','#b48cff','#ff6fae','#2ec4b6','#c9a227'];
+const ROOTCOL = '#ffbf00';
+const ROW = 36, GAPX = 46;
+const FF = 'system-ui,-apple-system,"Segoe UI","Nirmala UI","Mangal",Roboto,sans-serif';
+const NS = 'http://www.w3.org/2000/svg';
+const $ = s => document.querySelector(s);
+const svg = $('#svg'), view = $('#view'), stage = $('#stage');
+
+/* ---- Hindi ⇄ English name transliteration ---- */
+const HI_V={'अ':'a','आ':'a','इ':'i','ई':'i','उ':'u','ऊ':'u','ऋ':'ri','ए':'e','ऐ':'ai','ओ':'o','औ':'au','ऑ':'o'};
+const HI_M={'ा':'a','ि':'i','ी':'ee','ु':'u','ू':'u','ृ':'ri','े':'e','ै':'ai','ो':'o','ौ':'au','ॉ':'o','ॅ':'e'};
+const HI_C={'क':'k','ख':'kh','ग':'g','घ':'gh','ङ':'n','च':'ch','छ':'chh','ज':'j','झ':'jh','ञ':'n','ट':'t','ठ':'th','ड':'d','ढ':'dh','ण':'n','त':'t','थ':'th','द':'d','ध':'dh','न':'n','प':'p','फ':'ph','ब':'b','भ':'bh','म':'m','य':'y','र':'r','ल':'l','व':'v','श':'sh','ष':'sh','स':'s','ह':'h','ळ':'l','क़':'q','ख़':'kh','ग़':'gh','ज़':'z','ड़':'r','ढ़':'rh','फ़':'f','य़':'y'};
+const HI_NUK={'क':'q','ख':'kh','ग':'gh','ज':'z','ड':'r','ढ':'rh','फ':'f'};
+const LABIAL='पफबभम';
+// common name endings, transliterated separately so compound names come out right (सकल+दीप → Sakaldeep)
+const HI_SUFFIX=['प्रकाश','नारायण','शंकर','बहादुर','प्रसाद','प्रताप','चन्द्र','चंद्र','विलास','मूर्ति','सुंदर','श्याम','प्रीत','दीप','देव','राज','जीत','नाथ','दास','पाल','लाल','वीर','वती','पति','मणि','बली','राय','राव'];
+// whole-word spellings the rules would get wrong (and spellings already used in the Dev Nandan map)
+const HI_EN={'सिंह':'Singh','राय':'Rai','राव':'Rao','नयन':'Nayan','नीतिन':'Nitin','अश्वीन':'Ashwin','सीताराम':'Sitaram','सतीश':'Satish',
+  'आशीष':'Ashish','मनीष':'Manish','जगदीश':'Jagdish','धनीराम':'Dhaniram','पीतांबर':'Pitambar','भीलन':'Bhilan','गंभीरा':'Gambhira',
+  'अन्वित':'Anvit','अमीय':'Amiy','द्वारिका':'Dwarika','आसरे':'Asare','हर्षवर्धन':'Harshvardhan','देवब्रत':'Devbrat','(शिवम)':'(Shivam)'};
+function hiCore(w,part){
+  const ch=[...w.normalize('NFD').replace(/ज्ञ/g,'\u0001')], syl=[]; let i=0;
+  while(i<ch.length){
+    let c=ch[i];
+    if(c==='\u0001'||HI_C[c]!==undefined){
+      const cl=[]; let fin=false;
+      for(;;){
+        let lat;
+        if(c==='\u0001'){ lat='gy'; i++; }
+        else { lat=HI_C[c]; i++; if(ch[i]==='़'){ lat=HI_NUK[c]||lat; i++; } }
+        if(c==='व'&&cl.length&&/s$|sh$/.test(cl[cl.length-1])) lat='w';   // स्व → sw, श्व → shw
+        cl.push(lat);
+        if(ch[i]==='्'&&ch[i+1]&&(ch[i+1]==='\u0001'||HI_C[ch[i+1]]!==undefined)){ i++; c=ch[i]; continue; }
+        if(ch[i]==='्'){ i++; fin=true; }
+        break;
+      }
+      const s={c:cl.join(''),n:cl.length,v:'a',inh:true,nas:''};
+      if(fin){ s.v=''; s.inh=false; }
+      else if(HI_M[ch[i]]!==undefined){ s.v=HI_M[ch[i]]; s.m=ch[i]; s.inh=false; i++; }
+      syl.push(s);
+    } else if(HI_V[c]!==undefined){ syl.push({c:'',n:0,v:HI_V[c],inh:false,ind:c,nas:''}); i++; }
+    else if(c==='ं'||c==='ँ'){ if(syl.length) syl[syl.length-1].nas=((ch[i+1]&&LABIAL.includes(ch[i+1]))||(c==='ं'&&i+1===ch.length&&!part))?'m':'n'; i++; }
+    else if(c==='ः'){ if(syl.length) syl[syl.length-1].nas+='h'; i++; }
+    else { syl.push({c:c,n:0,v:'',inh:false,raw:true,nas:''}); i++; }
+  }
+  const N=syl.length, L=syl[N-1];
+  // final schwa: राम → Ram, आदर्श → Adarsh; kept after conjuncts ending in r/y/v/n/m (Rajendra, Aditya, Krishna, Brahma)
+  if(N>1&&L&&L.inh&&!L.nas&&(L.n===1||!/(r|y|v|w|n|m)$/.test(L.c))) L.del=true;
+  for(let k=N-2;k>=1;k--){                                  // medial schwa: VC(a)CV → VCCV
+    const s=syl[k], p=syl[k-1], q=syl[k+1];
+    if(!s.inh||s.nas||s.n!==1) continue;
+    if(p.del||p.v===''||p.raw) continue;
+    if(!q||q.del||q.c===''||q.raw||q.v===''||q.n>1) continue;   // never build a 3-consonant cluster (Chaitanya, Akhand)
+    s.del=true;
+  }
+  let out='';
+  syl.forEach((s,k)=>{ let v=s.del?'':s.v; if(k===N-1&&(s.m==='ी'||s.ind==='ई')) v='i'; out+=s.c+v+s.nas; });
+  return out;
+}
+let LEARN_HI_EN={}, LEARN_EN_HI={};
+function hiWord(w,learned,part){
+  if(learned&&LEARN_HI_EN[w]) return LEARN_HI_EN[w];
+  if(HI_EN[w]) return HI_EN[w];
+  for(const s of HI_SUFFIX){
+    if(w.length-s.length>=2&&w.endsWith(s)){
+      const pre=w.slice(0,-s.length);
+      if(pre.endsWith('्')) continue;
+      const a=hiWord(pre,learned,true), b=HI_EN[s]||hiCore(s);
+      return a+b.toLowerCase();
+    }
+  }
+  const r=hiCore(w,part); return r.charAt(0).toUpperCase()+r.slice(1);
+}
+function hi2en(t,learned){ return String(t||'').split(/(\s+)/).map(w=>/[ऀ-ॿ]/.test(w)?hiWord(w,learned):w).join(''); }
+const L_CONS=[['ksh','क्ष'],['chh','छ'],['gy','ज्ञ'],['kh','ख'],['gh','घ'],['ch','च'],['jh','झ'],['th','थ'],['dh','ध'],['ph','फ'],['bh','भ'],['sh','श'],['k','क'],['g','ग'],['c','क'],['j','ज'],['t','त'],['d','द'],['n','न'],['p','प'],['b','ब'],['m','म'],['y','य'],['r','र'],['l','ल'],['v','व'],['w','व'],['s','स'],['h','ह'],['f','फ़'],['z','ज़'],['q','क़'],['x','क्स']];
+const L_VOW=[['aa','ा','आ'],['ai','ै','ऐ'],['au','ौ','औ'],['ee','ी','ई'],['oo','ू','ऊ'],['a','','अ'],['i','ि','इ'],['u','ु','उ'],['e','े','ए'],['o','ो','ओ']];
+// common name parts in English → Hindi, so joined names split correctly (Rajeshkumar → राजेश + कुमार)
+const EN_PARTS={kumar:'कुमार',prakash:'प्रकाश',narayan:'नारायण',shankar:'शंकर',singh:'सिंह',prasad:'प्रसाद',pratap:'प्रताप',bahadur:'बहादुर',chandra:'चंद्र',nath:'नाथ',lal:'लाल',das:'दास',dev:'देव',raj:'राज',deep:'दीप',jeet:'जीत',veer:'वीर',pal:'पाल',kant:'कांत',ram:'राम',shyam:'श्याम',mani:'मणि',pati:'पति',vati:'वती',bali:'बली',rai:'राय',rao:'राव',shah:'शाह'};
+function enKnown(x){ return LEARN_EN_HI[x]||EN_PARTS[x]||''; }
+function enWord(w){
+  const low=w.toLowerCase();
+  if(LEARN_EN_HI[low]) return LEARN_EN_HI[low];
+  if(EN_PARTS[low]) return EN_PARTS[low];
+  for(let i=low.length-2;i>=2;i--){ const a=enKnown(low.slice(0,i)), b=enKnown(low.slice(i)); if(a&&b) return a+b; }   // two known parts
+  for(let i=low.length-2;i>=2;i--){ const b=EN_PARTS[low.slice(i)]; if(b) return enWord(w.slice(0,i))+b; }             // unknown + common ending
+  let out='', i=0, prevC=false;
+  while(i<low.length){
+    const m=L_CONS.find(([l])=>low.startsWith(l,i));
+    if(m){ if(prevC) out+='्'; out+=m[1]; i+=m[0].length; prevC=true; continue; }
+    const v=L_VOW.find(([l])=>low.startsWith(l,i));
+    if(v){ let mat=v[1], ind=v[2]; if(v[0]==='i'&&i+1===low.length){ mat='ी'; ind='ई'; } out+=prevC?mat:ind; i+=v[0].length; prevC=false; continue; }
+    out+=w[i]; i++; prevC=false;
+  }
+  return out;
+}
+function en2hi(t){ return String(t||'').split(/(\s+)/).map(w=>/[A-Za-z]/.test(w)?enWord(w):w).join(''); }
+// word pairs already in the map teach the converters (so "Ram" → "राम", and corrected spellings are reused)
+function learn(){
+  LEARN_HI_EN={}; LEARN_EN_HI={};
+  const pairs=[]; walk(root,n=>pairs.push(n)); pairs.sort((a,b)=>(b.em?1:0)-(a.em?1:0));
+  pairs.forEach(n=>{
+    const h=n.text.trim().split(/\s+/), e=(n.en||'').trim().split(/\s+/);
+    if(!n.text.trim()||h.length!==e.length) return;
+    h.forEach((hw,k)=>{ const ew=e[k]; if(!LEARN_EN_HI[ew.toLowerCase()]) LEARN_EN_HI[ew.toLowerCase()]=hw; if(n.em&&!LEARN_HI_EN[hw]) LEARN_HI_EN[hw]=ew; });
+  });
+}
+
+/* ---- language ---- */
+let LANG='hi';
+try{ if(localStorage.getItem('nayandev-lang')==='en') LANG='en'; }catch(e){}
+const label = n => LANG==='en' ? (n.en||'') : n.text;
+function fillEn(r){ walk(r,n=>{ if(n.en==null||(n.en===''&&n.text)) n.en=hi2en(n.text); }); return r; }
+
+/* ---- model ---- */
+let uid = 0;
+const nid = () => 'n' + (++uid);
+function mk(text, children){ return {id:nid(), text:text||'', en:'', children:children||[], collapsed:false}; }
+function toPlain(n){ const o={text:n.text,en:n.en||''}; if(n.em)o.em=1; if(n.color)o.color=n.color; if(n.me)o.me=1; if(n.collapsed)o.collapsed=true; if(n.info)o.info=n.info; o.children=n.children.map(toPlain); return o; }
+function fromPlain(o){ const n=mk(String(o.text==null?'':o.text), (o.children||[]).map(fromPlain)); n.en=o.en==null?null:String(o.en); if(o.em)n.em=1; if(o.color)n.color=o.color; if(o.me)n.me=1; if(o.collapsed)n.collapsed=true; if(o.info&&typeof o.info==='object'&&Object.keys(o.info).length)n.info=o.info; return n; }
+
+function parseOutline(src){
+  const items = src.replace(/\r/g,'').split('\n').filter(l=>l.trim()!=='').map(l=>{
+    const ind = l.match(/^[ \t]*/)[0].replace(/\t/g,'  ').length;
+    let t = l.trim().replace(/^[-*+]\s+/,'').replace(/^#+\s+/,'');
+    if(t==='<empty>') t='';
+    return {ind,t};
+  });
+  if(!items.length) throw new Error('empty');
+  const pos = items.map(i=>i.ind).filter(x=>x>0);
+  const unit = pos.length ? Math.min(...pos) : 2;
+  const rootN = mk(items[0].t);
+  const stack = [{lvl:0,node:rootN}];
+  for(let i=1;i<items.length;i++){
+    const lvl = Math.max(1,Math.round(items[i].ind/unit));
+    const n = mk(items[i].t);
+    while(stack.length>1 && stack[stack.length-1].lvl>=lvl) stack.pop();
+    stack[stack.length-1].node.children.push(n);
+    stack.push({lvl,node:n});
+  }
+  return rootN;
+}
+
+let root, sel = null, query = '';
+let byId = {}, parentOf = {};
+function walk(n,f,p,i){ f(n,p||null,i||0); n.children.forEach((c,j)=>walk(c,f,n,j)); }
+function index(){ byId={}; parentOf={}; walk(root,(n,p)=>{byId[n.id]=n; parentOf[n.id]=p;}); }
+function descCount(n){ let c=0; n.children.forEach(ch=>{c+=1+descCount(ch);}); return c; }
+function isDesc(anc,id){ let c=byId[id]; while(c){ if(c.id===anc) return true; c=parentOf[c.id]; } return false; }
+function depthOf(n){ let d=0,c=n; while(parentOf[c.id]){ d++; c=parentOf[c.id]; } return d; }
+function visibleNodes(){ const out=[]; (function r(n){ out.push(n); if(!n.collapsed) n.children.forEach(r); })(root); return out; }
+
+/* ---- history / persistence ---- */
+let hist=[], hi=-1;
+const snap = () => JSON.stringify(root,(k,v)=>['x','y','w','_h'].includes(k)?undefined:v);
+function persist(){ return; try{ localStorage.setItem(KEY, JSON.stringify(toPlain(root))); }catch(e){ toast('Could not save in this browser (storage full?) — use Export JSON now'); } }
+function fixUid(){ walk(root,n=>{ const m=/^n(\d+)$/.exec(n.id); if(m) uid=Math.max(uid,+m[1]); }); }
+function commit(){
+  hist = hist.slice(0,hi+1); hist.push(snap()); if(hist.length>200) hist.shift(); hi=hist.length-1;
+  persist(); render();
+}
+function restore(s){
+  root = JSON.parse(s); fixUid(); index(); if(!byId[sel]) sel=root.id; persist(); render();
+}
+function undo(){ if(hi>0){ hi--; restore(hist[hi]); } }
+function redo(){ if(hi<hist.length-1){ hi++; restore(hist[hi]); } }
+
+/* ---- layout ---- */
+const ctx = document.createElement('canvas').getContext('2d');
+function tw(t,font){ ctx.font=font; return ctx.measureText(t).width; }
+function layout(){
+  walk(root,n=>{
+    n.w = n===root ? Math.max(96,tw(label(n)||' ','700 17px '+FF)+36) : Math.max(54,tw(label(n)||'(empty)','15px '+FF)+22);
+  });
+  walk(root,n=>{ if(n.me) n.w+=20; });
+  walk(root,n=>{ const y=yrs(n); n._yw=y?tw(' '+y,'11px '+FF)+2:0; n.w+=n._yw; });   // birth–death years after the name
+  // generation = position in the tree (top person = GENBASE), recomputed on every render, never stored
+  (function g(n,k){ n._g=GENBASE+k; n._gw=SHOWGEN?tw(String(n._g),'700 10px '+FF)+(n===root?12:8):0; n.w+=n._gw; n.children.forEach(c=>g(c,k+1)); })(root,0);
+  (function h(n){ n._h = (n.collapsed||!n.children.length) ? ROW : n.children.reduce((s,c)=>s+h(c),0); return n._h; })(root);
+  // generation columns (C): everyone of one generation shares an x position; otherwise each child sits right after its parent
+  COLX=null; COLW=null;
+  if(COLS){ const mw=[]; (function m(n,d){ mw[d]=Math.max(mw[d]||0,n.w); if(!n.collapsed) n.children.forEach(c=>m(c,d+1)); })(root,0); COLW=mw; COLX=[0]; for(let d=1;d<mw.length;d++) COLX[d]=COLX[d-1]+mw[d-1]+GAPX; }
+  (function place(n,x,top,d){
+    n.x=COLX?COLX[d]:x; n.y=top+n._h/2;
+    if(!n.collapsed&&n.children.length){ let t=top; n.children.forEach(c=>{ place(c,n.x+n.w+GAPX,t,d+1); t+=c._h; }); }
+  })(root,0,0,0);
+}
+const anchorY = n => n===root ? n.y : n.y+11;
+function hitBox(n){ const a=anchorY(n); return n===root ? {x:n.x-3,y:n.y-22,w:n.w+6,h:44} : {x:n.x-3,y:a-26,w:n.w+6,h:34}; }
+// Colour = family branch. The generation where the family divides into the most sizeable
+// branches (up to 5) is found automatically; each of those branches gets one validated hue,
+// ancestors above them and small offshoots stay neutral grey.
+let headSlot={};
+function computeBranches(){
+  headSlot={};
+  const size={}, byDepth={};
+  (function s(n,d){ let t=1; n.children.forEach(c=>{ t+=s(c,d+1); }); size[n.id]=t; (byDepth[d]=byDepth[d]||[]).push(n); return t; })(root,0);
+  const min=Math.max(5,Math.round(size[root.id]*0.03));
+  let best=null;
+  Object.keys(byDepth).forEach(d=>{
+    if(+d===0) return;
+    const big=byDepth[d].filter(n=>size[n.id]>=min).sort((a,b)=>size[b.id]-size[a.id]).slice(0,5);
+    if(big.length<2) return;
+    const score=big.reduce((s,n)=>s+size[n.id],0)*(1+0.15*big.length);
+    if(!best||score>best.score) best={score,big};
+  });
+  if(best){ let k=0; walk(root,n=>{ if(best.big.includes(n)) headSlot[n.id]=++k; }); }
+}
+function colorOf(n){
+  if(n===root) return n.color||(meNode()?'var(--mine)':ROOTCOL);
+  let c=n;
+  while(c){
+    if(c.color) return c.color;
+    if(headSlot[c.id]) return 'var(--s'+headSlot[c.id]+')';
+    c=parentOf[c.id];
+  }
+  return 'var(--trunk)';
+}
+let mineSet={}, focusMine=false, relSet={}, relOn=false, relPick=false, relA=null, COLS=false, COLX=null, COLW=null;
+let SHOWGEN=true, GENBASE=1;
+try{ const gs=localStorage.getItem(KEY+'-gen'); if(gs){ const o=JSON.parse(gs); SHOWGEN=o.show!==false; if(Number.isFinite(o.base)) GENBASE=o.base; } }catch(e){}
+function meNode(){ let m=null; walk(root,n=>{ if(!m&&n.me) m=n; }); return m; }
+function computeMine(){
+  mineSet={}; const me=meNode(); if(!me) return;
+  walk(me,n=>{ mineSet[n.id]=2; });
+  let c=me; while(c){ mineSet[c.id]=1; c=parentOf[c.id]; }
+}
+const onMine = n => mineSet[n.id]===1;
+const dimmed = n => relOn ? !relSet[n.id] : (focusMine && !mineSet[n.id]);
+
+/* ---- render ---- */
+function el(tag,attrs,parent){ const e=document.createElementNS(NS,tag); for(const k in attrs) e.setAttribute(k,attrs[k]); if(parent) parent.appendChild(e); return e; }
+function render(){
+  index(); computeBranches(); computeMine(); layout();
+  view.textContent='';
+  const bandG=el('g',{},view), linkG=el('g',{},view), nodeG=el('g',{},view); drawBands(bandG);
+  const q=query.trim().toLowerCase();
+  (function draw(n){
+    const a=anchorY(n), col=colorOf(n), isRoot=n===root, hb=hitBox(n);
+    const g=el('g',{'class':'node'+(isRoot?' root':'')+(n.me?' me':'')+(dimmed(n)?' dim':'')+(n.id===sel?' sel':'')+(q&&isMatch(n,q)?' match':''),'data-id':n.id},nodeG);
+    if(relSet[n.id]) g.classList.add('rel');
+    if(isRoot) el('rect',{x:n.x,y:n.y-19,width:n.w,height:38,rx:10,style:'fill:'+col},g);
+    else { if(onMine(n)) el('line',{x1:n.x,x2:n.x+n.w,y1:a,y2:a,style:'stroke:var(--mine2)','stroke-width':7.5,'stroke-linecap':'round'},g);
+      el('line',{x1:n.x,x2:n.x+n.w,y1:a,y2:a,style:'stroke:'+(onMine(n)?'var(--mine)':col),'stroke-width':onMine(n)?3.4:2.4,'stroke-linecap':'round'},g); }
+    el('rect',{'class':'hit',x:hb.x,y:hb.y,width:hb.w,height:hb.h,rx:8},g);
+    const t=el('text',isRoot?{x:n.x+n._gw+(n.w-n._gw)/2,y:n.y+6,'text-anchor':'middle'}:{x:n.x+8+n._gw,y:a-8},g);
+    if(SHOWGEN){ const gt=el('text',{'class':'gen',x:n.x+(isRoot?10:4),y:isRoot?n.y+5:a-8},g); gt.textContent=n._g; }
+    if(label(n)){ t.textContent=label(n); } else { t.textContent='(empty)'; t.setAttribute('class','empty'); }
+    if(n.me){ const st=document.createElementNS(NS,'tspan'); st.textContent='★ '; st.setAttribute('style','fill:var(--mine)'); t.insertBefore(st,t.firstChild); }
+    if(n._yw){ const ys=document.createElementNS(NS,'tspan'); ys.setAttribute('class','yrs'); ys.textContent=' '+yrs(n); t.appendChild(ys); }
+    if(n.children.length){
+      const cx=n.x+n.w+13;
+      const tg=el('g',{'data-tog':n.id},g);
+      el('circle',{'class':'tog',cx:cx,cy:a,r:9,style:'stroke:'+col},tg);
+      const tt=el('text',{'class':'togt',x:cx,y:a+3.5},tg);
+      tt.textContent = n.collapsed ? String(descCount(n)) : '−';
+    }
+    if(!n.collapsed) n.children.forEach(c=>{
+      const x1=n.x+n.w, y1=a, x2=c.x, y2=anchorY(c), dx=(x2-x1)*0.55;
+      const dd=`M${x1} ${y1} C${x1+dx} ${y1} ${x2-dx} ${y2} ${x2} ${y2}`;
+      if(onMine(c)) el('path',{'class':'link mine-o',d:dd,style:'stroke:var(--mine2)'},linkG);
+      el('path',{'class':'link'+(onMine(c)?' mine':'')+(dimmed(c)?' dim':'')+(relSet[c.id]&&relSet[n.id]?' rel':''),d:dd,style:'stroke:'+(onMine(c)?'var(--mine)':colorOf(c))},linkG);
+      draw(c);
+    });
+  })(root);
+  updateUi(); renderLegend();
+}
+function updateSel(){
+  document.querySelectorAll('.node').forEach(g=>g.classList.toggle('sel',g.dataset.id===sel));
+  updateUi();
+}
+function updateUi(){
+  let total=0; walk(root,()=>{total++;});
+  syncSide(); updRuler();
+  $('#count').textContent = total+' nodes';
+  const n=byId[sel];
+  $('#title').textContent=(label(root)||'Mind Map')+' · Mind Map';
+  $('#lHi').classList.toggle('on',LANG==='hi'); $('#lEn').classList.toggle('on',LANG==='en');
+  if(n){ const path=[]; let c=n; while(c){ path.unshift(label(c)||'(empty)'); c=parentOf[c.id]; } $('#crumb').textContent=path.join('  ›  ')+(n._g!=null?'   ·   Generation '+n._g:''); }
+  else $('#crumb').textContent='No node selected';
+  $('#bUndo').disabled = hi<=0; $('#bRedo').disabled = hi>=hist.length-1;
+  const has=!!n, isR=n===root;
+  ['bEdit','bSib','bChild','bParent'].forEach(i=>$('#'+i).disabled=!has && i!=='bChild');
+  $('#bDel').disabled=!has||(isR&&n.children.length!==1);
+  ['bUp','bDown','bOut','bIn'].forEach(i=>$('#'+i).disabled=!has||isR);
+}
+
+/* ---- view: pan / zoom ---- */
+const T={x:60,y:0,k:1};
+function applyT(){ const hv=document.getElementById('hov'); if(hv) hv.classList.remove('on'); view.setAttribute('transform',`translate(${T.x} ${T.y}) scale(${T.k})`); const z=document.getElementById('zl'); if(z) z.textContent=Math.round(T.k*100)+'%'; updRuler(); }
+function fit(){
+  const vis=visibleNodes(); if(!vis.length) return;
+  let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;
+  vis.forEach(n=>{ x0=Math.min(x0,n.x); x1=Math.max(x1,n.x+n.w+30); y0=Math.min(y0,n.y-ROW/2); y1=Math.max(y1,n.y+ROW/2); });
+  const r=svg.getBoundingClientRect(), pad=40;
+  const k=Math.max(.2,Math.min(1.2,(r.width-2*pad)/(x1-x0),(r.height-2*pad)/(y1-y0)));
+  T.k=k; T.x=(r.width-(x1-x0)*k)/2-x0*k; T.y=(r.height-(y1-y0)*k)/2-y0*k; applyT();
+}
+function ensureVisible(n){
+  const r=svg.getBoundingClientRect(), sx=T.x+T.k*n.x, ex=T.x+T.k*(n.x+n.w), sy=T.y+T.k*n.y;
+  if(sx<30||ex>r.width-30||sy<30||sy>r.height-30){ T.x=r.width/2-T.k*(n.x+n.w/2); T.y=r.height/2-T.k*n.y; applyT(); }
+}
+svg.addEventListener('wheel',e=>{
+  e.preventDefault();
+  const r=svg.getBoundingClientRect(), mx=e.clientX-r.left, my=e.clientY-r.top;
+  const nk=Math.max(.2,Math.min(3,T.k*Math.exp(-e.deltaY*0.0015))), f=nk/T.k;
+  T.x=mx-(mx-T.x)*f; T.y=my-(my-T.y)*f; T.k=nk; applyT();
+},{passive:false});
+function focusNode(n){
+  const r=svg.getBoundingClientRect(); T.k=Math.max(T.k,1);
+  T.x=r.width/2-T.k*(n.x+n.w/2); T.y=r.height/2-T.k*n.y; applyT();
+}
+function zoomBy(f){
+  const r=svg.getBoundingClientRect(), mx=r.width/2, my=r.height/2;
+  const nk=Math.max(.2,Math.min(3,T.k*f)), g=nk/T.k;
+  T.x=mx-(mx-T.x)*g; T.y=my-(my-T.y)*g; T.k=nk; applyT();
+}
+
+/* ---- editing ---- */
+let editing=null;
+function edit(id,isNew,prevSel){ if(RO()) return; 
+  const n=byId[id]; if(!n) return;
+  if(editing) return;
+  sel=id; updateSel(); ensureVisible(n);
+  learn();
+  const hb=hitBox(n), k=T.k, fs=Math.max(13,Math.min(20,15*k));
+  // two boxes: the current language on top, the other one below (auto-filled while typing, editable)
+  const box=document.createElement('div'); box.id='editor';
+  box.style.left=(T.x+k*hb.x)+'px'; box.style.top=(T.y+k*hb.y)+'px'; box.style.width=Math.max(k*hb.w+12,200)+'px';
+  const inp=document.createElement('input'), lab=document.createElement('label'), oth=document.createElement('input');
+  const curIsHi=LANG==='hi';
+  inp.value=curIsHi?n.text:(n.en||''); oth.value=curIsHi?(n.en||''):n.text;
+  inp.style.fontSize=fs+'px'; oth.style.fontSize='13px'; if(n===root) inp.style.fontWeight='700';
+  lab.textContent=curIsHi?'English (auto — edit if needed)':'हिंदी (auto — edit if needed)';
+  box.append(inp,lab,oth); stage.appendChild(box);
+  let othTouched=false, done=false;
+  inp.addEventListener('input',()=>{ if(!othTouched) oth.value=curIsHi?hi2en(inp.value,true):en2hi(inp.value); });
+  oth.addEventListener('input',()=>{ othTouched=true; });
+  editing={inp:box};
+  function finish(save,after){
+    if(done) return; done=true; editing=null;
+    const a=inp.value.trim(), b=oth.value.trim(); box.remove();
+    const hv=curIsHi?a:b, ev=curIsHi?b:a;
+    if(save){
+      if(hv!==n.text||ev!==(n.en||'')){
+        n.text=hv; n.en=ev;
+        if(ev&&ev!==hi2en(hv)) n.em=1; else delete n.em;   // remember hand-corrected English spellings
+        commit();
+      } else render();
+    }
+    else if(isNew){ undo(); if(prevSel&&byId[prevSel]){ sel=prevSel; updateSel(); } }
+    else render();
+    if(after) after();
+  }
+  [inp,oth].forEach(x=>x.addEventListener('keydown',e=>{
+    e.stopPropagation();
+    if(e.key==='Enter'){ e.preventDefault(); finish(true); }
+    else if(e.key==='Tab'&&x===oth&&e.shiftKey){ e.preventDefault(); inp.focus(); }
+    else if(e.key==='Tab'&&x===inp&&e.shiftKey){ e.preventDefault(); oth.focus(); }
+    else if(e.key==='Tab'){ e.preventDefault(); finish(true,()=>addChild()); }
+    else if(e.key==='Escape'){ e.preventDefault(); finish(false); }
+  }));
+  box.addEventListener('focusout',e=>{ if(!box.contains(e.relatedTarget)) setTimeout(()=>{ if(!box.contains(document.activeElement)) finish(true); },0); });
+  inp.focus(); inp.select();
+}
+function setLang(l){
+  if(editing) editing.inp.querySelector('input').blur();
+  LANG=l; try{ localStorage.setItem('nayandev-lang',l); }catch(e){}
+  document.documentElement.lang=l==='hi'?'hi':'en';
+  render();
+}
+
+/* ---- commands ---- */
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('on'); clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove('on'),1800); }
+function addChild(){ if(RO()) return; 
+  const p=byId[sel]||root, n=mk('');
+  p.children.push(n); p.collapsed=false; sel=n.id; commit(); edit(n.id,true,p.id);
+}
+function addSibling(){ if(RO()) return; 
+  const cur=byId[sel]; if(!cur||cur===root){ addChild(); return; }
+  const p=parentOf[cur.id], n=mk('');
+  p.children.splice(p.children.indexOf(cur)+1,0,n); sel=n.id; commit(); edit(n.id,true,cur.id);
+}
+function addParent(){ if(RO()) return; 
+  const n=byId[sel]; if(!n) return;
+  const np=mk('');
+  if(n===root){ np.children=[root]; root=np; }
+  else { const p=parentOf[n.id]; p.children.splice(p.children.indexOf(n),1,np); np.children=[n]; }
+  sel=np.id; commit(); edit(np.id,true,n.id);
+}
+// Delete removes only this person: their children move up and join the parent in the same place,
+// so the generations below simply shift up by one. Shift+Delete (with confirmation) removes the whole branch.
+function deleteSel(whole){ if(RO()) return; 
+  const n=byId[sel]; if(!n) return;
+  const nm=n0=>(typeof label==='function'?label(n0):n0.text)||'(empty)';
+  if(n===root){
+    if(whole||n.children.length!==1){ toast('The top person can be removed only when they have exactly one child'); return; }
+    root=n.children[0]; sel=root.id; commit(); toast('Removed "'+nm(n)+'" — Ctrl+Z to undo'); return;
+  }
+  const p=parentOf[n.id], i=p.children.indexOf(n);
+  if(whole){
+    const c=descCount(n);
+    if(c&&!confirm('Delete "'+nm(n)+'" AND all '+c+' people below them?')) return;
+    p.children.splice(i,1); sel=(p.children[i]||p.children[i-1]||p).id; commit();
+    toast('Deleted the whole branch — Ctrl+Z to undo'); return;
+  }
+  const kids=n.children.slice();
+  p.children.splice(i,1,...kids); p.collapsed=false;
+  sel=(kids[0]||p.children[i]||p.children[i-1]||p).id; commit();
+  toast('Removed "'+nm(n)+'"'+(kids.length?' — '+kids.length+' moved up under "'+nm(p)+'"':'')+' — Ctrl+Z to undo');
+}
+function moveSel(d){ if(RO()) return; 
+  const n=byId[sel]; if(!n||n===root) return;
+  const p=parentOf[n.id], i=p.children.indexOf(n), j=i+d;
+  if(j<0||j>=p.children.length) return;
+  p.children.splice(i,1); p.children.splice(j,0,n); commit();
+}
+function indentSel(){ if(RO()) return; 
+  const n=byId[sel]; if(!n||n===root) return;
+  const p=parentOf[n.id], i=p.children.indexOf(n); if(i===0){ toast('Needs a previous sibling to indent under'); return; }
+  const prev=p.children[i-1]; p.children.splice(i,1); prev.children.push(n); prev.collapsed=false; commit();
+}
+function outdentSel(){ if(RO()) return; 
+  const n=byId[sel]; if(!n||n===root) return;
+  const p=parentOf[n.id], gp=parentOf[p.id]; if(!gp){ toast('Already at the top level'); return; }
+  p.children.splice(p.children.indexOf(n),1); gp.children.splice(gp.children.indexOf(p)+1,0,n); commit();
+}
+function toggle(id){ const n=byId[id]; if(n&&n.children.length){ n.collapsed=!n.collapsed; commit(); } }
+function setAll(c){ walk(root,n=>{ if(n!==root&&n.children.length) n.collapsed=c; }); commit(); fit(); }
+function setColor(c){ if(RO()) return;  const n=byId[sel]; if(!n) return; if(c) n.color=c; else delete n.color; commit(); }
+function moveNode(id,tid,mode){ if(RO()) return; 
+  const n=byId[id], p=parentOf[id]; p.children.splice(p.children.indexOf(n),1);
+  if(mode==='child'){ const t=byId[tid]; t.children.push(n); t.collapsed=false; }
+  else { const t=byId[tid], tp=parentOf[tid], i=tp.children.indexOf(t); tp.children.splice(mode==='before'?i:i+1,0,n); }
+  commit();
+}
+function go(dir){
+  let n=byId[sel]; if(!n){ sel=root.id; updateSel(); return; }
+  let t=null;
+  if(dir==='left') t=parentOf[n.id];
+  else if(dir==='right'){ if(n.children.length){ if(n.collapsed){ n.collapsed=false; commit(); } t=byId[n.id].children[0]; } }
+  else {
+    const d=depthOf(n), c=visibleNodes().filter(x=>depthOf(x)===d).sort((a,b)=>a.y-b.y), i=c.indexOf(n);
+    t=c[i+(dir==='down'?1:-1)];
+  }
+  if(t){ sel=t.id; updateSel(); ensureVisible(byId[t.id]); }
+}
+
+/* ---- import / export ---- */
+function download(name,text,type){
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([text],{type:type||'text/plain'})); a.download=name;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+function toOutline(n,d,out){ out.push('  '.repeat(d)+(d?'- ':'')+(label(n)===''?'<empty>':label(n))); n.children.forEach(c=>toOutline(c,d+1,out)); return out; }
+function load(newRoot,msg){ root=newRoot; sel=root.id; commit(); fit(); if(msg) toast(msg); }
+// an imported plain outline is in whichever language is showing; derive the other one
+function fromOutlineInLang(txt){
+  const r=parseOutline(txt);
+  if(LANG==='en'){ learn(); walk(r,n=>{ n.en=n.text; n.text=en2hi(n.en); }); }
+  else walk(r,n=>{ n.en=hi2en(n.text); });
+  return r;
+}
+$('#file').addEventListener('change',e=>{
+  const f=e.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const txt=String(r.result).trim(); let nr;
+      if(txt[0]==='{'){ const o=JSON.parse(txt); nr=fillEn(fromPlain(o.root||o)); } else nr=fromOutlineInLang(txt);
+      load(nr,'Imported '+f.name);
+    }catch(err){ toast('Could not read that file'); }
+  };
+  r.readAsText(f); e.target.value='';
+});
+
+/* ---- pointer interaction ---- */
+let drag=null, dropInfo=null, dropLine=null, ghost=null;
+function clearDrop(){
+  document.querySelectorAll('.hit.drop-child').forEach(h=>h.classList.remove('drop-child'));
+  if(dropLine){ dropLine.remove(); dropLine=null; } dropInfo=null;
+}
+svg.addEventListener('pointerdown',e=>{
+  if(e.button!==0) return;
+  if(e.target.closest('[data-tog]')) return;
+  const g=e.target.closest('.node');
+  if(g){ sel=g.dataset.id; updateSel(); drag={mode:'node',id:g.dataset.id,sx:e.clientX,sy:e.clientY,active:false}; }
+  else { drag={mode:'pan',sx:e.clientX,sy:e.clientY,tx:T.x,ty:T.y,moved:false}; svg.classList.add('panning'); }
+});
+window.addEventListener('pointermove',e=>{
+  if(!drag) return;
+  const dx=e.clientX-drag.sx, dy=e.clientY-drag.sy;
+  if(drag.mode==='pan'){
+    if(Math.abs(dx)+Math.abs(dy)>3) drag.moved=true;
+    T.x=drag.tx+dx; T.y=drag.ty+dy; applyT(); return;
+  }
+  if(!drag.active){
+    return;   // view-only: no drag-to-move
+    drag.active=true; ghost=document.createElement('div'); ghost.className='ghost';
+    ghost.textContent=label(byId[drag.id])||'(empty)'; document.body.appendChild(ghost);
+  }
+  ghost.style.left=(e.clientX+12)+'px'; ghost.style.top=(e.clientY+8)+'px';
+  clearDrop();
+  const t=document.elementFromPoint(e.clientX,e.clientY), g=t&&t.closest&&t.closest('.node');
+  if(!g||g.dataset.id===drag.id||isDesc(drag.id,g.dataset.id)) return;
+  const tid=g.dataset.id, hit=g.querySelector('.hit'), r=hit.getBoundingClientRect(), rel=(e.clientY-r.top)/r.height;
+  const mode = tid===root.id ? 'child' : rel<.28 ? 'before' : rel>.72 ? 'after' : 'child';
+  dropInfo={tid,mode};
+  if(mode==='child') hit.classList.add('drop-child');
+  else {
+    const tn=byId[tid], hb=hitBox(tn), y=mode==='before'?hb.y:hb.y+hb.h;
+    dropLine=el('line',{x1:tn.x,x2:tn.x+tn.w,y1:y,y2:y,stroke:'var(--sel)','stroke-width':3,'stroke-linecap':'round'},view);
+  }
+});
+window.addEventListener('pointerup',()=>{
+  if(!drag) return;
+  const d=drag, info=dropInfo; drag=null;
+  svg.classList.remove('panning');
+  if(ghost){ ghost.remove(); ghost=null; }
+  clearDrop();
+  if(d.mode==='pan'){ if(!d.moved){ sel=null; updateSel(); } return; }
+  if(d.active&&info) moveNode(d.id,info.tid,info.mode);
+});
+svg.addEventListener('click',e=>{ const t=e.target.closest('[data-tog]'); if(t) toggle(t.dataset.tog); });
+svg.addEventListener('dblclick',e=>{ const g=e.target.closest('.node'); if(g&&!e.target.closest('[data-tog]')) edit(g.dataset.id,false); });
+
+/* ---- keyboard ---- */
+document.addEventListener('keydown',e=>{
+  if(editing) return;
+  const ae=document.activeElement, inSearch=ae===$('#search')||(ae&&(ae.tagName==='INPUT'||ae.tagName==='TEXTAREA'));
+  if(ae&&ae.closest&&ae.closest('#side')) return;   // typing in the details panel
+  const mod=e.ctrlKey||e.metaKey, key=e.key.toLowerCase();
+  if(mod&&key==='z'){ e.preventDefault(); e.shiftKey?redo():undo(); return; }
+  if(mod&&key==='y'){ e.preventDefault(); redo(); return; }
+  if(mod&&key==='f'){ e.preventDefault(); $('#search').focus(); $('#search').select(); return; }
+  if(inSearch||mod) return;
+  const n=byId[sel];
+  switch(e.key){
+    case 'Tab': e.preventDefault(); e.shiftKey?addParent():addChild(); break;
+    case 'Enter': e.preventDefault(); addSibling(); break;
+    case 'F2': if(n){ e.preventDefault(); edit(sel,false); } break;
+    case 'Delete': case 'Backspace': e.preventDefault(); deleteSel(e.shiftKey); break;
+    case ' ': if(n){ e.preventDefault(); toggle(sel); } break;
+    case 'ArrowLeft': e.preventDefault(); e.altKey?outdentSel():go('left'); break;
+    case 'ArrowRight': e.preventDefault(); e.altKey?indentSel():go('right'); break;
+    case 'ArrowUp': e.preventDefault(); e.altKey?moveSel(-1):go('up'); break;
+    case 'ArrowDown': e.preventDefault(); e.altKey?moveSel(1):go('down'); break;
+    case 'Escape': sel=null; updateSel(); break;
+    case 'g': case 'G': $('#bGen').click(); break;
+    case '+': case '=': e.preventDefault(); zoomBy(1.25); break;
+    case '-': case '_': e.preventDefault(); zoomBy(0.8); break;
+    case 'l': case 'L': setLang(LANG==='hi'?'en':'hi'); break;
+  }
+});
+
+/* ---- search ---- */
+let matchIdx=-1;
+function isMatch(n,q){ return n.text.toLowerCase().includes(q)||(n.en||'').toLowerCase().includes(q); }
+function matches(){ const q=query.trim().toLowerCase(); const out=[]; if(q) walk(root,n=>{ if(isMatch(n,q)) out.push(n); }); return out; }
+$('#search').addEventListener('input',e=>{
+  query=e.target.value; matchIdx=-1;
+  const ms=matches();
+  ms.forEach(m=>{ let p=parentOf[m.id]; while(p){ p.collapsed=false; p=parentOf[p.id]; } });
+  render(); if(query) toast(ms.length+' match'+(ms.length===1?'':'es'));
+});
+$('#search').addEventListener('keydown',e=>{
+  e.stopPropagation();
+  if(e.key==='Enter'){
+    e.preventDefault();
+    const ms=matches(); if(!ms.length){ toast('No match'); return; }
+    matchIdx=(matchIdx+(e.shiftKey?-1:1)+ms.length)%ms.length;
+    const m=ms[matchIdx]; let p=parentOf[m.id];
+    while(p){ p.collapsed=false; p=parentOf[p.id]; }
+    sel=m.id; render(); focusNode(byId[sel]);
+    const g=document.querySelector('.node[data-id="'+sel+'"]'); if(g){ g.classList.add('flash'); setTimeout(()=>g.classList.remove('flash'),2500); }
+    toast((matchIdx+1)+' of '+ms.length+(ms.length>1?' — Enter: next, Shift+Enter: previous':''));
+  }
+  else if(e.key==='Escape'){ e.target.value=''; query=''; e.target.blur(); render(); }
+});
+
+/* ---- toolbar ---- */
+const colorsBox=$('#colors');
+PALETTE.forEach(c=>{ const b=document.createElement('button'); b.className='sw'; b.style.background=c; b.title='Set branch colour '+c; b.addEventListener('click',()=>setColor(c)); colorsBox.appendChild(b); });
+const cp=document.createElement('input'); cp.type='color'; cp.value='#ffbf00'; cp.title='Custom colour'; cp.addEventListener('change',()=>setColor(cp.value)); colorsBox.appendChild(cp);
+const rb=document.createElement('button'); rb.textContent='Auto'; rb.title='Remove custom colour (inherit from parent)'; rb.addEventListener('click',()=>setColor(null)); colorsBox.appendChild(rb);
+$('#bChild').onclick=addChild; $('#bSib').onclick=addSibling; $('#bParent').onclick=addParent; $('#bEdit').onclick=()=>edit(sel,false); $('#bDel').onclick=()=>deleteSel(false);
+$('#bUp').onclick=()=>moveSel(-1); $('#bDown').onclick=()=>moveSel(1); $('#bOut').onclick=outdentSel; $('#bIn').onclick=indentSel;
+$('#bExp').onclick=()=>setAll(false); $('#bCol').onclick=()=>setAll(true); $('#bFit').onclick=fit; $('#bZi').onclick=()=>zoomBy(1.25); $('#bZo').onclick=()=>zoomBy(0.8);
+$('#bUndo').onclick=undo; $('#bRedo').onclick=redo;
+function goTo(n){ let p=parentOf[n.id]; while(p){ p.collapsed=false; p=parentOf[p.id]; } sel=n.id; render(); focusNode(byId[sel]); }
+$('#bMe').onclick=()=>{ const m=meNode(); if(m) goTo(m); else toast('Select yourself, then click "Set as me"'); };
+$('#bSetMe').onclick=()=>{ if(RO()) return;  const n=byId[sel]; if(!n){ toast('Select a person first'); return; } walk(root,x=>{ delete x.me; }); n.me=1; commit(); toast('Marked as me'); };
+function saveGen(){ try{ localStorage.setItem(KEY+'-gen',JSON.stringify({show:SHOWGEN,base:GENBASE})); }catch(e){} }
+$('#bGen').classList.toggle('on',SHOWGEN); $('#genBase').value=GENBASE;
+$('#bGen').onclick=()=>{ SHOWGEN=!SHOWGEN; $('#bGen').classList.toggle('on',SHOWGEN); saveGen(); render(); };
+$('#genBase').addEventListener('change',e=>{ const v=parseInt(e.target.value,10); if(!isNaN(v)){ GENBASE=v; saveGen(); render(); } });
+$('#bFocus').onclick=()=>{ focusMine=!focusMine; $('#bFocus').classList.toggle('on',focusMine); if(focusMine&&!meNode()) toast('No one is marked as me yet'); render(); };
+let legendMin=false;
+const esc = s => String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function renderLegend(){
+  const L=$('#legend'); if(!L) return;
+  const lab=n=>(typeof label==='function'?label(n):n.text)||'(empty)';
+  const heads=Object.keys(headSlot).map(id=>byId[id]).filter(Boolean).sort((a,b)=>headSlot[a.id]-headSlot[b.id]);
+  let h='<div class="hd">Colours '+(legendMin?'▸':'▾')+'</div><div class="rows">';
+  heads.forEach(n=>{ h+='<div class="row" data-go="'+n.id+'"><span class="sw2" style="background:var(--s'+headSlot[n.id]+')"></span>'+esc(lab(n))+' branch<span class="cnt">'+(descCount(n)+1)+'</span></div>'; });
+  h+='<div class="row"><span class="sw2" style="background:var(--trunk)"></span>Ancestors &amp; smaller branches</div>';
+  const m=meNode(); if(m) h+='<div class="row" data-go="'+m.id+'"><span class="sw2" style="background:var(--mine);height:4px;box-shadow:0 0 0 2px var(--mine2)"></span>★ My line ('+esc(lab(m))+')</div>';
+  L.innerHTML=h+'</div>'; L.classList.toggle('min',legendMin);
+}
+// hover bar: see-through buttons above the name under the pointer
+const hov=$('#hov'); let hovId=null, hovT=null;
+function hideHov(){ hov.classList.remove('on'); hovId=null; }
+function showHov(id){
+  const n=byId[id]; if(!n||editing||(drag&&(drag.active||drag.mode==='pan'))) return;
+  hovId=id; hov.classList.add('on');
+  const hb=hitBox(n); let top=T.y+T.k*hb.y-hov.offsetHeight-3;
+  if(top<2) top=T.y+T.k*(hb.y+hb.h)+3;
+  hov.style.left=Math.max(2,T.x+T.k*hb.x)+'px'; hov.style.top=top+'px';
+  hov.querySelector('[data-act="del"]').disabled=(n===root&&n.children.length!==1);
+}
+svg.addEventListener('pointerover',e=>{ const g=e.target.closest&&e.target.closest('.node'); if(g){ clearTimeout(hovT); if(hovId!==g.dataset.id) showHov(g.dataset.id); } });
+svg.addEventListener('pointerout',e=>{ if(e.pointerType==='touch') return; if(e.target.closest&&e.target.closest('.node')){ clearTimeout(hovT); hovT=setTimeout(hideHov,400); } });
+hov.addEventListener('pointerenter',()=>clearTimeout(hovT));
+hov.addEventListener('pointerleave',()=>{ clearTimeout(hovT); hovT=setTimeout(hideHov,250); });
+hov.addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b||!hovId||b.disabled) return;
+  const id=hovId; hideHov(); sel=id; updateSel();
+  ({child:addChild, sib:addSibling, parent:addParent, edit:()=>edit(id,false), del:()=>deleteSel(false), info:()=>{ if(SIDE!=='info') openSide('info'); }})[b.dataset.act]();
+});
+$('#legend').addEventListener('click',e=>{
+  if(e.target.closest('.hd')){ legendMin=!legendMin; renderLegend(); return; }
+  const r=e.target.closest('[data-go]'); if(r&&byId[r.dataset.go]) goTo(byId[r.dataset.go]);
+});
+$('#bJson').onclick=()=>download('nayan-dev-mindmap.json',JSON.stringify({format:'mindmap-tree',version:2,languages:['hi','en'],root:toPlain(root)},null,2),'application/json');
+$('#bMd').onclick=()=>download('nayan-dev-outline-'+LANG+'.txt',toOutline(root,0,[]).join('\n')+'\n');
+$('#bImp').onclick=()=>$('#file').click();
+$('#bReset').onclick=()=>{ if(confirm('Replace the whole map with the original data read from the phone? (You can undo with Ctrl+Z.)')) load(fillEn(parseOutline(SEED)),'Reset to original'); };
+$('#lHi').onclick=()=>setLang('hi'); $('#lEn').onclick=()=>setLang('en');
+window.addEventListener('resize',()=>{ if(editing) editing.inp.querySelector('input').blur(); });
+
+/* ---- more views: generation columns, person details, relationship finder, stats, picture export, touch ---- */
+const lbl = n => ((typeof label==='function'?label(n):n.text)||'(empty)');
+// years next to the name come from n.info.born / n.info.died (first 3–4 digit number in each)
+function yrOf(s){ const m=/\d{3,4}/.exec(s||''); return m?m[0]:''; }
+function yrs(n){ const i=n.info; if(!i) return ''; const b=yrOf(i.born), d=yrOf(i.died); return b||d ? b+'–'+d : ''; }
+
+// generation columns: layout() reads COLS and fills COLX / COLW; the ruler above the map follows pan & zoom
+try{ COLS=localStorage.getItem(KEY+'-cols')==='1'; }catch(e){}
+function drawBands(g){
+  if(!COLX) return;
+  COLX.forEach((x,d)=>{ if(d%2) return; el('rect',{'class':'colband',x:x-GAPX/2+4,y:-30,width:COLW[d]+GAPX-8,height:root._h+60,rx:10},g); });
+}
+function updRuler(){
+  const R=document.getElementById('ruler'); if(!R) return;
+  if(!COLX){ R.classList.remove('on'); return; }
+  R.classList.add('on');
+  const w=svg.getBoundingClientRect().width, me=meNode(), md=me?me._g-GENBASE:-1;
+  let h='', last=-1e9;
+  COLX.forEach((x,d)=>{
+    const sx=T.x+T.k*x, ex=T.x+T.k*(x+COLW[d]); if(ex<0||sx>w) return;
+    const px=Math.max(4,sx); if(px-last<62) return; last=px;
+    h+='<span'+(d===md?' class="mine" title="Your generation"':'')+' style="left:'+px.toFixed(1)+'px">Gen '+(GENBASE+d)+'</span>';
+  });
+  R.innerHTML=h;
+}
+function toggleCols(){
+  COLS=!COLS; try{ localStorage.setItem(KEY+'-cols',COLS?'1':'0'); }catch(e){}
+  $('#bCols').classList.toggle('on',COLS);
+  const n=byId[sel]||root, sx=T.x+T.k*n.x, sy=T.y+T.k*n.y;   // keep the selected person where it was on screen
+  render(); T.x=sx-T.k*n.x; T.y=sy-T.k*n.y; applyT();
+}
+
+// side panel: 'info' (details of the selected person) or 'stats'; rebuilt only when selection / data / language changes
+const side=$('#side');
+let SIDE=null, sideKey='';
+function openSide(m){ SIDE=SIDE===m?null:m; sideKey=''; $('#bInfo').classList.toggle('on',SIDE==='info'); $('#bStats').classList.toggle('on',SIDE==='stats'); syncSide(); }
+function syncSide(){
+  if(!side) return;
+  side.classList.toggle('on',!!SIDE); if(!SIDE) return;
+  const k=SIDE+'|'+sel+'|'+hi+'|'+(typeof LANG==='string'?LANG:'')+'|'+GENBASE;
+  if(k===sideKey) return; sideKey=k;
+  const ae=document.activeElement, f=ae&&side.contains(ae)?ae.dataset.f:null;
+  side.innerHTML=SIDE==='info'?infoHtml():statsHtml();
+  if(f){ const x=side.querySelector('[data-f="'+f+'"]'); if(x){ x.focus(); if(x.setSelectionRange) x.setSelectionRange(x.value.length,x.value.length); } }
+}
+function infoHtml(){
+  const n=byId[sel];
+  let h='<div class="sh">Person details<button class="x" data-x title="Close (I)">×</button></div><div class="sb">';
+  if(!n) return h+'<p style="color:var(--muted)">Select a person on the map to see or add their details.</p></div>';
+  const i=n.info||{}, other=typeof label==='function'?(LANG==='en'?n.text:n.en):'';
+  h+='<div style="display:flex;gap:12px;align-items:flex-start"><div class="photo" data-photo title="Click to '+(i.photo?'change':'add')+' a photo">'+(i.photo?'<img alt="Photo" src="'+i.photo+'">':'+ Photo')+'</div>';
+  h+='<div style="min-width:0"><div style="font-size:16px;font-weight:700;overflow-wrap:anywhere">'+esc(lbl(n))+(n.me?' <span style="color:var(--mine)">★</span>':'')+'</div>'+(other?'<div style="color:var(--muted)">'+esc(other)+'</div>':'');
+  h+='<div style="color:var(--muted);margin-top:4px">Generation '+n._g+' · '+n.children.length+' children · '+descCount(n)+' below</div>'+(i.photo?'<button data-rmphoto style="margin-top:6px;font-size:12px">Remove photo</button>':'')+'</div></div>';
+  const fld=(f,t,ph)=>'<label>'+t+'</label><input type="text" data-f="'+f+'" value="'+esc(i[f]||'')+'" placeholder="" readonly>';
+  h+='<div class="two"><div>'+fld('born','Born','e.g. 1952')+'</div><div>'+fld('died','Died','empty if alive')+'</div></div>';
+  h+=fld('place','Village / place','e.g. village, district');
+  h+='<label>Notes</label><textarea data-f="note" readonly>'+esc(i.note||'')+'</textarea>';
+  const p=parentOf[n.id]; if(p) h+='<p style="margin:10px 0 0;color:var(--muted)">Parent: <a href="#" data-go="'+p.id+'">'+esc(lbl(p))+'</a></p>';
+  return h+'<p style="color:var(--muted);font-size:11px;margin:10px 0 0">Saved with the map and in Export JSON. Years show next to the name.</p></div>';
+}
+function statsHtml(){
+  const per=[], fam=[]; let total=0, empty=0, withInfo=0;
+  walk(root,n=>{ total++; const d=n._g-GENBASE; per[d]=(per[d]||0)+1; if(!n.text.trim()) empty++; if(n.info) withInfo++; if(n.children.length) fam.push(n); });
+  const me=meNode(), md=me?me._g-GENBASE:-1, max=Math.max(1,...per.map(x=>x||0));
+  let h='<div class="sh">Family statistics<button class="x" data-x title="Close">×</button></div><div class="sb">';
+  h+='<div class="kpi"><div><b>'+total+'</b><span>people</span></div><div><b>'+per.length+'</b><span>generations</span></div><div><b>'+fam.length+'</b><span>families</span></div></div>';
+  h+='<h4>People per generation</h4>';
+  for(let d=0;d<per.length;d++){ const c=per[d]||0;
+    h+='<div class="st-row'+(d===md?' mine':'')+'" title="Generation '+(GENBASE+d)+': '+c+(c===1?' person':' people')+(d===md?' — your generation':'')+'"><span>Gen '+(GENBASE+d)+'</span><span><span class="st-bar" style="width:'+Math.max(1.5,c/max*100).toFixed(1)+'%"></span></span><span class="st-n">'+c+'</span></div>'; }
+  fam.sort((a,b)=>b.children.length-a.children.length);
+  h+='<h4>Largest families</h4><div class="lst">';
+  fam.slice(0,8).forEach(n=>{ h+='<div data-go="'+n.id+'"><span>'+esc(lbl(n))+' <span style="color:var(--muted)">· Gen '+n._g+'</span></span><span class="st-n">'+n.children.length+' children</span></div>'; });
+  h+='</div><h4>More</h4><div class="lst">';
+  h+='<div><span>Average children per family</span><span class="st-n">'+(fam.length?((total-1)/fam.length).toFixed(1):'0')+'</span></div>';
+  if(me) h+='<div data-go="'+me.id+'"><span>★ Your generation</span><span class="st-n">Gen '+me._g+' · '+(per[md]||0)+' people</span></div>';
+  h+='<div><span>Names still empty</span><span class="st-n">'+empty+'</span></div>';
+  h+='<div><span>People with details added</span><span class="st-n">'+withInfo+'</span></div>';
+  return h+'</div></div>';
+}
+if(side){
+  side.addEventListener('change',e=>{
+    const f=e.target.dataset.f; if(!f) return;
+    const id=sel, v=e.target.value.trim();
+    setTimeout(()=>{   // after the focus has moved on, so the next box keeps it when the panel is rebuilt
+      const n=byId[id]; if(!n||v===((n.info||{})[f]||'')) return;
+      const i=Object.assign({},n.info||{}); if(v) i[f]=v; else delete i[f];
+      if(Object.keys(i).length) n.info=i; else delete n.info;
+      commit();
+    },0);
+  });
+  side.addEventListener('click',e=>{
+    if(e.target.closest('[data-x]')){ openSide(SIDE); return; }
+    if(e.target.closest('[data-photo]')){ return;  photoIn.dataset.id=sel; photoIn.click(); return; }
+    if(e.target.closest('[data-rmphoto]')){ const n=byId[sel]; if(n&&n.info){ const i=Object.assign({},n.info); delete i.photo; if(Object.keys(i).length) n.info=i; else delete n.info; commit(); } return; }
+    const g=e.target.closest('[data-go]'); if(g&&byId[g.dataset.go]){ e.preventDefault(); goTo(byId[g.dataset.go]); }
+  });
+}
+// photos are shrunk to at most 192 px (JPEG) so the browser storage does not fill up
+const photoIn=document.createElement('input'); photoIn.type='file'; photoIn.accept='image/*'; photoIn.hidden=true; document.body.appendChild(photoIn);
+photoIn.addEventListener('change',()=>{
+  const f=photoIn.files[0], id=photoIn.dataset.id; photoIn.value=''; if(!f) return;
+  const url=URL.createObjectURL(f), img=new Image();
+  img.onload=()=>{
+    const s=Math.min(1,192/Math.max(img.width,img.height)), c=document.createElement('canvas');
+    c.width=Math.max(1,Math.round(img.width*s)); c.height=Math.max(1,Math.round(img.height*s));
+    c.getContext('2d').drawImage(img,0,0,c.width,c.height); URL.revokeObjectURL(url);
+    const n=byId[id]; if(!n) return;
+    n.info=Object.assign({},n.info||{},{photo:c.toDataURL('image/jpeg',0.82)}); commit(); toast('Photo added');
+  };
+  img.onerror=()=>{ URL.revokeObjectURL(url); toast('Could not read that picture'); };
+  img.src=url;
+});
+
+// relationship finder: path A → common ancestor → B is highlighted (relSet), everyone else fades
+const relbox=$('#relbox');
+function ord(k){ const s=['th','st','nd','rd'], v=k%100; return k+(s[(v-20)%10]||s[v]||s[0]); }
+function greats(k,w){ return k<=0?w:k===1?'great-'+w:k===2?'great-great-'+w:ord(k)+' great-'+w; }
+function relName(da,db){   // what B is to A; da / db = generations from A / B up to the common ancestor
+  if(da===0) return db===1?'child (son / daughter)':db===2?'grandchild':greats(db-2,'grandchild');
+  if(db===0) return da===1?'parent (father / mother)':da===2?'grandparent':greats(da-2,'grandparent');
+  if(da===1&&db===1) return 'sibling (brother / sister)';
+  if(da===1) return db===2?'nephew / niece':greats(db-3,'grand-nephew / niece');
+  if(db===1) return da===2?'uncle / aunt':greats(da-3,'grand-uncle / aunt');
+  const deg=Math.min(da,db)-1, rem=Math.abs(da-db);
+  return ord(deg)+' cousin'+(rem===0?'':rem===1?', once removed':rem===2?', twice removed':', '+rem+' times removed');
+}
+function relHi(da,db){
+  return {'0,1':'बेटा / बेटी','0,2':'पोता / पोती','0,3':'परपोता / परपोती','1,0':'पिता / माता','2,0':'दादा / दादी','3,0':'परदादा / परदादी',
+    '1,1':'भाई / बहन','1,2':'भतीजा / भतीजी','2,1':'चाचा / ताऊ / बुआ','2,2':'चचेरा भाई / बहन'}[da+','+db]||'';
+}
+function showRel(h){ relbox.innerHTML='<button class="x" data-x title="Clear (Esc)">×</button>'+h; relbox.classList.add('on'); }
+function clearRel(){ relPick=false; relOn=false; relSet={}; relbox.classList.remove('on'); $('#bRel').classList.remove('on'); render(); }
+relbox.addEventListener('click',e=>{ if(e.target.closest('[data-x]')) clearRel(); });
+function startRel(){
+  if(relPick||relOn){ clearRel(); return; }
+  const a=byId[sel]; if(!a){ toast('Select the first person, then press Relation'); return; }
+  relA=a.id; relPick=true; $('#bRel').classList.add('on');
+  showRel('First person: <b>'+esc(lbl(a))+'</b> (Gen '+a._g+'). Now <b>click the second person</b> on the map. Esc cancels.');
+}
+function fitNodes(list){
+  let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;
+  list.forEach(n=>{ x0=Math.min(x0,n.x); x1=Math.max(x1,n.x+n.w+30); y0=Math.min(y0,n.y-ROW); y1=Math.max(y1,n.y+ROW); });
+  const r=svg.getBoundingClientRect(), pad=50, top=70;
+  const k=Math.max(.2,Math.min(1.2,(r.width-2*pad)/(x1-x0),(r.height-pad-top)/(y1-y0)));
+  T.k=k; T.x=(r.width-(x1-x0)*k)/2-x0*k; T.y=top+(r.height-pad-top-(y1-y0)*k)/2-y0*k; applyT();
+}
+function finishRel(bid){
+  const a=byId[relA], b=byId[bid]; relPick=false; if(!a||!b){ clearRel(); return; }
+  const upA=[]; for(let c=a;c;c=parentOf[c.id]) upA.push(c);
+  const upB=[]; let c=b; while(c&&!upA.includes(c)){ upB.push(c); c=parentOf[c.id]; }
+  const lca=c, da=upA.indexOf(lca), db=upB.length;
+  relSet={}; upA.slice(0,da+1).concat(upB).forEach(n=>{ relSet[n.id]=1; }); relOn=true;
+  [a,b].forEach(n=>{ let p=parentOf[n.id]; while(p){ p.collapsed=false; p=parentOf[p.id]; } });
+  sel=b.id; render(); fitNodes(Object.keys(relSet).map(id=>byId[id]));
+  if(a===b){ showRel('That is the same person.'); return; }
+  const ht=relHi(da,db), A=esc(lbl(a)), B=esc(lbl(b));
+  const sub=(da===0||db===0) ? 'Direct line — '+(da+db)+' generation'+(da+db===1?'':'s')+' apart.'
+    : 'Common ancestor: <b>'+esc(lbl(lca))+'</b> (Gen '+lca._g+') — '+A+' is '+da+' and '+B+' is '+db+' generation'+(db===1?'':'s')+' below.';
+  showRel('<b>'+B+'</b> is <b>'+A+'</b>’s <b class="big">'+relName(da,db)+'</b>'+(ht?' <span style="color:var(--muted)">('+ht+')</span>':'')+'<br><span style="color:var(--muted)">'+sub+'</span>');
+}
+
+// picture / poster / PDF: a copy of the drawn map with every colour and font written in, so it looks the same outside this page
+function buildSvg(){
+  const keepSel=sel, keepQ=query; sel=null; query=''; render();
+  let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;
+  visibleNodes().forEach(n=>{ x0=Math.min(x0,n.x); x1=Math.max(x1,n.x+n.w+30); y0=Math.min(y0,n.y-24); y1=Math.max(y1,n.y+24); });
+  if(COLX) y0-=26;
+  const pad=24, head=66, W=Math.ceil(x1-x0+2*pad), H=Math.ceil(y1-y0+head+pad);
+  const clone=view.cloneNode(true), so=view.querySelectorAll('*'), sc=clone.querySelectorAll('*');
+  so.forEach((o,i)=>{
+    const cs=getComputedStyle(o), c=sc[i], tg=o.tagName; let st='';
+    if(tg==='text'||tg==='tspan') st='fill:'+cs.fill+';font-size:'+cs.fontSize+';font-weight:'+cs.fontWeight+';font-style:'+cs.fontStyle+';text-anchor:'+cs.textAnchor+';';
+    else if(tg!=='g') st='fill:'+cs.fill+';stroke:'+cs.stroke+';stroke-width:'+cs.strokeWidth+';stroke-linecap:'+cs.strokeLinecap+';'+(cs.strokeDasharray&&cs.strokeDasharray!=='none'?'stroke-dasharray:'+cs.strokeDasharray+';':'');
+    if(cs.opacity!=='1') st+='opacity:'+cs.opacity+';';
+    if(o.classList.contains('hit')) c.setAttribute('data-rm','1');
+    c.setAttribute('style',st); ['class','data-id','data-tog'].forEach(a=>c.removeAttribute(a));
+  });
+  clone.querySelectorAll('[data-rm]').forEach(x=>x.remove());
+  clone.setAttribute('transform','translate('+(pad-x0)+' '+(head-y0)+')');
+  sel=keepSel; query=keepQ; render();
+  const bs=getComputedStyle(document.body), muted=getComputedStyle(document.documentElement).getPropertyValue('--muted').trim()||'#888';
+  let total=0; walk(root,()=>{ total++; });
+  let gens='';
+  if(COLX) COLX.forEach((x,d)=>{ gens+='<text x="'+x+'" y="'+(y0+14)+'" style="font-size:11px;font-weight:700;fill:'+muted+'">Gen '+(GENBASE+d)+'</text>'; });
+  const s='<svg xmlns="'+NS+'" width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'" style="font-family:'+FF.replace(/"/g,"'")+'">'
+    +'<rect width="'+W+'" height="'+H+'" fill="'+bs.backgroundColor+'"/>'
+    +'<text x="'+pad+'" y="36" style="font-size:22px;font-weight:700;fill:'+bs.color+'">'+esc(lbl(root))+' · Family tree</text>'
+    +'<text x="'+pad+'" y="56" style="font-size:12px;fill:'+muted+'">'+total+' people · '+esc(new Date().toLocaleDateString())+'</text>'
+    +'<g transform="translate('+(pad-x0)+' '+(head-y0)+')">'+gens+'</g>'
+    +new XMLSerializer().serializeToString(clone)+'</svg>';
+  let col=false; walk(root,n=>{ if(n.collapsed&&n.children.length) col=true; });
+  if(col) toast('Saved what is open on screen — use Expand all first for the whole tree');
+  return {s,W,H};
+}
+const fileBase=KEY.replace(/-mindmap.*$/,'')+'-family-tree';
+function saveBlob(b,name){ const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),5000); }
+function exportPng(){
+  const {s,W,H}=buildSvg(), k=Math.min(2,16000/W,16000/H,Math.sqrt(120e6/(W*H))), img=new Image();
+  img.onload=()=>{
+    const c=document.createElement('canvas'); c.width=Math.round(W*k); c.height=Math.round(H*k);
+    const x=c.getContext('2d'); x.scale(k,k); x.drawImage(img,0,0);
+    c.toBlob(b=>{ if(b){ saveBlob(b,fileBase+'.png'); toast('Picture saved'); } else toast('The map is too big for one picture — collapse some branches'); },'image/png');
+  };
+  img.onerror=()=>toast('Could not make the picture');
+  img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(s);
+}
+function exportSvg(){ const {s}=buildSvg(); download(fileBase+'.svg','<?xml version="1.0" encoding="UTF-8"?>\n'+s,'image/svg+xml'); }
+function printMap(){
+  const {s,W,H}=buildSvg(), w=window.open('','_blank'); if(!w){ toast('Allow pop-ups for this page to print'); return; }
+  w.document.write('<!doctype html><meta charset="utf-8"><title>'+esc(lbl(root))+' · Family tree</title><style>@page{size:'+W+'px '+H+'px;margin:0}html,body{margin:0}svg{display:block}</style>'+s+'<script>onload=function(){setTimeout(function(){print()},300)}<\/script>');
+  w.document.close();
+}
+
+// touch: pinch to zoom, double-tap a name to rename, tap the background to hide the hover buttons
+const ptrs=new Map(); let pinch=null, lastTap=null;
+svg.addEventListener('pointerdown',e=>{
+  ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(ptrs.size>=2){
+    e.stopImmediatePropagation(); drag=null; svg.classList.remove('panning'); hideHov();
+    if(ptrs.size===2){ const [p,q]=[...ptrs.values()], r=svg.getBoundingClientRect();
+      pinch={d:Math.hypot(p.x-q.x,p.y-q.y)||1,mx:(p.x+q.x)/2-r.left,my:(p.y+q.y)/2-r.top,tx:T.x,ty:T.y,k:T.k}; }
+    return;
+  }
+  const g=e.target.closest&&e.target.closest('.node');
+  if(relPick&&g&&e.button===0&&!e.target.closest('[data-tog]')){ e.stopImmediatePropagation(); finishRel(g.dataset.id); return; }
+  if(e.pointerType==='touch'){
+    if(!g) hideHov();
+    else if(!e.target.closest('[data-tog]')){
+      const now=Date.now();
+      if(lastTap&&lastTap.id===g.dataset.id&&now-lastTap.t<380){ e.preventDefault(); e.stopImmediatePropagation(); lastTap=null; const id=g.dataset.id; setTimeout(()=>edit(id,false),30); return; }
+      lastTap={id:g.dataset.id,t:now};
+    }
+  }
+},true);
+window.addEventListener('pointermove',e=>{
+  if(!ptrs.has(e.pointerId)) return;
+  ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(!pinch||ptrs.size!==2) return;
+  const [p,q]=[...ptrs.values()], r=svg.getBoundingClientRect();
+  const nk=Math.max(.2,Math.min(3,pinch.k*Math.hypot(p.x-q.x,p.y-q.y)/pinch.d)), mx=(p.x+q.x)/2-r.left, my=(p.y+q.y)/2-r.top;
+  T.x=mx-(pinch.mx-pinch.tx)*nk/pinch.k; T.y=my-(pinch.my-pinch.ty)*nk/pinch.k; T.k=nk; applyT();
+});
+['pointerup','pointercancel'].forEach(t=>window.addEventListener(t,e=>{ ptrs.delete(e.pointerId); if(ptrs.size<2) pinch=null; }));
+
+// buttons and keys for the features above
+$('#bCols').classList.toggle('on',COLS);
+$('#bCols').onclick=toggleCols; $('#bInfo').onclick=()=>openSide('info'); $('#bStats').onclick=()=>openSide('stats'); $('#bRel').onclick=startRel;
+$('#bPng').onclick=exportPng; $('#bSvg').onclick=exportSvg; $('#bPdf').onclick=printMap;
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&(relPick||relOn)){ clearRel(); return; }
+  if(editing||e.ctrlKey||e.metaKey||e.altKey) return;
+  const ae=document.activeElement; if(ae&&(ae.tagName==='INPUT'||ae.tagName==='TEXTAREA')) return;
+  const k=e.key.toLowerCase();
+  if(k==='c') toggleCols(); else if(k==='i') openSide('info'); else if(k==='r') startRel();
+});
+
+/* ---- start ---- */
+['bChild','bUp','bUndo'].forEach(id=>{ const b=document.getElementById(id); if(b) b.parentElement.style.display='none'; });
+try{
+  const saved=VIEW_DATA;
+  root = saved ? fromPlain(JSON.parse(saved)) : parseOutline(SEED);
+}catch(e){ root=parseOutline(SEED); }
+fillEn(root);   // older saves and the built-in data have Hindi only: add English
+document.documentElement.lang=LANG;
+if(!(function(){ let f=false; walk(root,n=>{ if(n.me) f=true; }); return f; })()){ let m=null; walk(root,n=>{ if(!m&&(n.text.startsWith('अभिजीत')||n.text.startsWith('Abhijeet')||(n.en||'').startsWith('Abhijeet'))) m=n; }); if(m) m.me=1; }
+// one-time rename asked for by the user on 2026-10-18: अभिजीत / Abhijeet → अभिजीत (शिवम) / Abhijeet (Shivam)
+try{ if(!localStorage.getItem(KEY+'-mig-shivam')){ const m=meNode();
+  if(m&&m.text==='अभिजीत'){ m.text='अभिजीत (शिवम)'; m.en='Abhijeet (Shivam)'; m.em=1; persist(); }
+  else if(m&&m.text==='Abhijeet'){ m.text='Abhijeet (Shivam)'; persist(); }
+  localStorage.setItem(KEY+'-mig-shivam','1'); } }catch(e){}
+// one-time fix (2026-10-18): Hindi of three renames typed in English had come out wrong
+try{ if(!localStorage.getItem(KEY+'-mig-kumar')){ const fx={"रजेश्कुमर":"राजेशकुमार","रकेश्कुमर":"राकेशकुमार","ब्रजेश्कुमर":"ब्रजेशकुमार"}; let ch=0;
+  walk(root,n=>{ if(fx[n.text]){ n.text=fx[n.text]; if(n.en&&n.en!==hi2en(n.text)) n.em=1; else delete n.em; ch++; } });
+  if(ch) persist(); localStorage.setItem(KEY+'-mig-kumar','1'); } }catch(e){}
+sel=root.id; index(); hist=[snap()]; hi=0; persist();
+render(); fit();
+})();
+</script>
+</body>
+</html>
